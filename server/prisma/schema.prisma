@@ -1,0 +1,104 @@
+// ChatBuilder — Prisma schema
+// Postgres + pgvector. The `Chunk.embedding` column is upgraded to vector(1536)
+// via a raw SQL migration after the initial prisma migrate.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String // bcrypt hash
+  name      String?
+  createdAt DateTime  @default(now())
+  chatbots  Chatbot[]
+
+  @@map("users")
+}
+
+model Chatbot {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  welcomeMessage String         @default("Hi! How can I help you?")
+  accentColor    String         @default("#6366f1")
+  position       String         @default("bottom-right") // bottom-right | bottom-left
+  allowedDomains String[]       @default([]) // empty = allow all
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  documents      Document[]
+  conversations  Conversation[]
+
+  @@index([userId])
+  @@map("chatbots")
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  chatbotId  String
+  chatbot    Chatbot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+  filename   String
+  fileType   String // pdf | txt | docx | url
+  source     String? // optional original URL if ingested from web
+  byteSize   Int      @default(0)
+  chunkCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  chunks     Chunk[]
+
+  @@index([chatbotId])
+  @@map("documents")
+}
+
+// The `embedding` column is created as Float[] by Prisma, then altered to
+// vector(1536) by a follow-up raw SQL migration. Queries use $queryRaw with
+// the `<=>` cosine distance operator.
+model Chunk {
+  id         String                       @id @default(cuid())
+  documentId String
+  document   Document                     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  chatbotId  String // denormalised for fast filtered vector search
+  content    String
+  chunkIndex Int
+  embedding  Unsupported("vector(1536)")?
+  createdAt  DateTime                     @default(now())
+
+  @@index([chatbotId])
+  @@index([documentId])
+  @@map("chunks")
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  chatbotId String
+  chatbot   Chatbot   @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+  visitorId String? // anonymous cookie id from embed widget
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@index([chatbotId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // user | assistant
+  content        String
+  sources        Json? // [{ documentId, filename }]
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@map("messages")
+}

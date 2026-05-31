@@ -1,0 +1,20 @@
+{
+  "name": "chatbuilder",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ChatBuilder — no-code AI chatbot builder with RAG (Project 3 of 6).",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

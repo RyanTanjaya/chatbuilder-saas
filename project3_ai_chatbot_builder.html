@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 3 — AI Chatbot Builder</title>
+<style>
+  :root {
+    --indigo: #6366f1;
+    --indigo-dark: #4f46e5;
+    --indigo-light: #e0e7ff;
+    --navy: #0f172a;
+    --slate: #334155;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --purple: #8b5cf6;
+    --sidebar-w: 260px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+
+  /* Layout */
+  .sidebar { width: var(--sidebar-w); background: var(--navy); position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; padding: 24px 0 40px; z-index: 100; }
+  .sidebar-logo { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+  .sidebar-logo .project { color: #a5b4fc; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+  .sidebar-logo .name { color: #fff; font-weight: 800; font-size: 15px; margin-top: 3px; }
+  .nav-section { padding: 10px 20px 4px; color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .nav-link { display: block; padding: 7px 20px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 13px; border-left: 3px solid transparent; transition: all .15s; }
+  .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,0.06); border-left-color: var(--indigo); }
+  .nav-link.sub { padding-left: 32px; font-size: 12px; }
+  .main { margin-left: var(--sidebar-w); max-width: 880px; padding: 48px 48px 100px; }
+
+  /* Header */
+  .page-header { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%); border-radius: 16px; padding: 40px; margin-bottom: 48px; color: white; position: relative; overflow: hidden; }
+  .page-header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: rgba(99,102,241,0.2); border-radius: 50%; }
+  .page-header::after { content: ''; position: absolute; bottom: -40px; left: 30%; width: 160px; height: 160px; background: rgba(139,92,246,0.15); border-radius: 50%; }
+  .page-header .tag { color: #a5b4fc; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; position: relative; }
+  .page-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; position: relative; }
+  .page-header p { color: rgba(255,255,255,0.6); font-size: 14px; max-width: 520px; position: relative; }
+  .header-badges { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; position: relative; }
+  .hbadge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.85); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; }
+  .hbadge.purple { background: rgba(139,92,246,0.25); border-color: rgba(139,92,246,0.5); color: #c4b5fd; }
+  .hbadge.green { background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4); color: #6ee7b7; }
+
+  /* Section */
+  .section { margin-bottom: 56px; }
+  h2 { font-size: 21px; font-weight: 800; color: var(--navy); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  h3 { font-size: 15px; font-weight: 700; color: var(--slate); margin: 28px 0 12px; }
+  h4 { font-size: 13px; font-weight: 700; color: var(--indigo-dark); margin: 18px 0 8px; text-transform: uppercase; letter-spacing: .05em; }
+  p { margin-bottom: 14px; }
+  a { color: var(--indigo-dark); text-decoration: none; }
+  strong { color: var(--navy); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 14px 0 22px; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead { background: var(--navy); color: white; }
+  thead th { padding: 11px 16px; text-align: left; font-weight: 600; font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f8faff; }
+  tbody td { padding: 10px 16px; vertical-align: top; }
+  tbody td:first-child { font-weight: 600; color: var(--slate); white-space: nowrap; }
+
+  /* Code */
+  pre { background: var(--navy); color: #e2e8f0; border-radius: 10px; padding: 20px; overflow-x: auto; font-size: 13px; line-height: 1.65; margin: 14px 0; font-family: 'Fira Code', Consolas, monospace; }
+  code { background: #e8ecf4; color: #4f46e5; padding: 2px 6px; border-radius: 5px; font-size: 13px; font-family: 'Fira Code', Consolas, monospace; }
+  pre code { background: none; color: inherit; padding: 0; }
+
+  /* Prompt blocks */
+  .prompt-block { background: #f0f4ff; border-left: 4px solid var(--indigo); border-radius: 0 10px 10px 0; padding: 14px 52px 14px 18px; margin: 12px 0; position: relative; }
+  .prompt-label { font-size: 10px; font-weight: 700; color: var(--indigo-dark); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .prompt-block p { margin: 0; color: var(--slate); font-style: italic; font-size: 13.5px; line-height: 1.6; }
+  .copy-btn { position: absolute; top: 12px; right: 12px; background: var(--indigo); color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; cursor: pointer; opacity: 0; transition: opacity .2s; }
+  .prompt-block:hover .copy-btn { opacity: 1; }
+
+  /* Cards */
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .feature-card .fc-icon { font-size: 22px; margin-bottom: 8px; }
+  .feature-card .fc-title { font-weight: 700; color: var(--navy); font-size: 14px; margin-bottom: 4px; }
+  .feature-card .fc-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .feature-card.highlight { border-color: var(--indigo); background: #fafbff; }
+
+  /* Phase cards */
+  .phase-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+  .phase-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+  .phase-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .phase-dot.mvp { background: var(--green); }
+  .phase-dot.polish { background: var(--amber); }
+  .phase-dot.stretch { background: var(--purple); }
+  .phase-header .ph-title { font-weight: 700; font-size: 14px; color: var(--navy); }
+  .phase-header .ph-tag { margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .ph-tag.mvp { background: var(--green-light); color: #065f46; }
+  .ph-tag.polish { background: #fef3c7; color: #92400e; }
+  .ph-tag.stretch { background: #ede9fe; color: #5b21b6; }
+  .phase-body { padding: 16px 20px; }
+  .phase-body ul { list-style: none; padding: 0; }
+  .phase-body ul li { padding: 5px 0; font-size: 13.5px; display: flex; gap: 8px; align-items: flex-start; border-bottom: 1px solid var(--border); }
+  .phase-body ul li:last-child { border-bottom: none; }
+  .phase-body ul li::before { content: '→'; color: var(--indigo); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+  /* Build steps */
+  .build-list { list-style: none; padding: 0; margin: 16px 0; }
+  .build-list li { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .build-list li:last-child { border-bottom: none; }
+  .step-num { width: 28px; height: 28px; background: linear-gradient(135deg, var(--indigo), var(--indigo-dark)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .step-body { flex: 1; }
+  .step-title { font-weight: 700; font-size: 14px; color: var(--navy); }
+  .step-desc { font-size: 13px; color: var(--text-muted); margin-top: 2px; line-height: 1.5; }
+
+  /* Pipeline diagram */
+  .pipeline { background: var(--navy); border-radius: 14px; padding: 28px; margin: 20px 0; }
+  .pipeline-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .pipeline-row:last-child { margin-bottom: 0; }
+  .pipe-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 10px 16px; color: white; font-size: 13px; font-weight: 600; flex: 1; text-align: center; }
+  .pipe-box.highlight { background: rgba(99,102,241,0.3); border-color: rgba(99,102,241,0.6); }
+  .pipe-box .sub { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 400; margin-top: 2px; }
+  .pipe-arrow { color: rgba(99,102,241,0.8); font-size: 18px; flex-shrink: 0; }
+  .pipeline-label { color: rgba(255,255,255,0.35); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+
+  /* Info / tip */
+  .info { background: #f0f4ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; color: var(--slate); display: flex; gap: 10px; }
+  .tip { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; color: #78350f; display: flex; gap: 10px; }
+  .warn { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; color: #9a3412; display: flex; gap: 10px; }
+  .info-icon, .tip-icon { flex-shrink: 0; margin-top: 1px; }
+
+  /* Endpoint list */
+  .endpoint { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .endpoint:last-child { border-bottom: none; }
+  .method { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; margin-top: 2px; font-family: monospace; }
+  .method.get { background: #d1fae5; color: #065f46; }
+  .method.post { background: #dbeafe; color: #1e40af; }
+  .method.put { background: #fef3c7; color: #92400e; }
+  .method.delete { background: #fee2e2; color: #991b1b; }
+  .endpoint-path { font-family: monospace; font-weight: 700; color: var(--navy); }
+  .endpoint-desc { color: var(--text-muted); font-size: 13px; }
+
+  /* Scroll top */
+  .scroll-top { position: fixed; bottom: 28px; right: 28px; background: var(--indigo); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(99,102,241,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .2s; z-index: 200; }
+  .scroll-top.visible { opacity: 1; }
+
+  ul { padding-left: 20px; margin: 10px 0 14px; }
+  li { margin-bottom: 5px; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 24px 20px 60px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .pipeline-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="project">Project 3 of 6</div>
+    <div class="name">AI Chatbot Builder</div>
+  </div>
+  <div class="nav-section">Overview</div>
+  <a class="nav-link" href="#overview">What It Does</a>
+  <a class="nav-link" href="#architecture">Architecture</a>
+  <a class="nav-link" href="#features">Feature Scope</a>
+
+  <div class="nav-section">Technical</div>
+  <a class="nav-link" href="#stack">Tech Stack</a>
+  <a class="nav-link" href="#rag">RAG Pipeline</a>
+  <a class="nav-link" href="#schema">Database Schema</a>
+  <a class="nav-link" href="#endpoints">API Endpoints</a>
+
+  <div class="nav-section">Build</div>
+  <a class="nav-link" href="#build-order">Build Order</a>
+  <a class="nav-link" href="#design-screens">Claude Design Screens</a>
+  <a class="nav-link" href="#prompts">AI Prompts</a>
+  <a class="nav-link" href="#deploy">Deployment</a>
+</aside>
+
+<main class="main">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="tag">Project 3 — AI Tool</div>
+    <h1>AI Chatbot Builder</h1>
+    <p>A no-code platform where anyone can create a custom AI chatbot trained on their own documents and embed it on any website — no technical knowledge required.</p>
+    <div class="header-badges">
+      <span class="hbadge purple">OpenAI + RAG</span>
+      <span class="hbadge">React + Node.js</span>
+      <span class="hbadge">Vector Database</span>
+      <span class="hbadge green">High Upwork Demand</span>
+    </div>
+  </div>
+
+  <!-- ═══════ OVERVIEW ═══════ -->
+  <section class="section" id="overview">
+    <h2>🤖 What It Does</h2>
+    <p>Users sign up, upload their documents (PDFs, text files, Word docs), and the app creates a chatbot that can answer questions based on that content. The chatbot gets a shareable link and an embeddable widget they can drop into any website with one line of code.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card highlight">
+        <div class="fc-icon">📄</div>
+        <div class="fc-title">Document Upload</div>
+        <div class="fc-desc">Upload PDFs, TXT, or DOCX files. The system chunks, embeds, and indexes them automatically.</div>
+      </div>
+      <div class="feature-card highlight">
+        <div class="fc-icon">🤖</div>
+        <div class="fc-title">Custom Chatbot</div>
+        <div class="fc-desc">Name your bot, set its personality and welcome message. It answers questions using only your documents.</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">💬</div>
+        <div class="fc-title">Live Chat Interface</div>
+        <div class="fc-desc">A clean chat UI for testing and using the bot directly in the dashboard.</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🔗</div>
+        <div class="fc-title">Embeddable Widget</div>
+        <div class="fc-desc">One script tag to embed the chatbot on any website as a floating bubble or inline widget.</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📊</div>
+        <div class="fc-title">Usage Dashboard</div>
+        <div class="fc-desc">See total messages, active chatbots, documents uploaded, and recent conversations.</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🔐</div>
+        <div class="fc-title">Auth + Multi-bot</div>
+        <div class="fc-desc">Each user can create and manage multiple chatbots. Full register/login flow.</div>
+      </div>
+    </div>
+
+    <div class="info"><span class="info-icon">💡</span><strong>Why this is valuable on Upwork:</strong> Businesses constantly need custom chatbots for their FAQs, docs, and support. Knowing how to build the RAG pipeline (embeddings + vector search + OpenAI) is one of the highest-paid skills right now at $50–100/hr.</div>
+  </section>
+
+  <!-- ═══════ ARCHITECTURE ═══════ -->
+  <section class="section" id="architecture">
+    <h2>🏗️ Architecture Overview</h2>
+    <p>The app has three layers — a React dashboard, a Node.js backend, and an embeddable widget that runs on the client's website.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>What it is</th><th>Where it runs</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>React SPA — manage bots, upload docs, test chat</td><td>Vercel</td></tr>
+          <tr><td>API Server</td><td>Node.js + Express — handles auth, uploads, embeddings, chat</td><td>Render</td></tr>
+          <tr><td>Database</td><td>PostgreSQL (Supabase) — users, chatbots, documents metadata</td><td>Supabase</td></tr>
+          <tr><td>Vector Store</td><td>Supabase pgvector — stores document embeddings for semantic search</td><td>Supabase</td></tr>
+          <tr><td>Embed Widget</td><td>A tiny JS file hosted on your server — iframe or web component</td><td>Render (static)</td></tr>
+          <tr><td>OpenAI</td><td>text-embedding-3-small (embeddings) + gpt-4o-mini (chat)</td><td>OpenAI API</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tip"><span class="tip-icon">💡</span>Use <strong>Supabase pgvector</strong> instead of Pinecone — it keeps your relational data and your vectors in one place, and you stay on the free tier. Pinecone is great but adds another service to manage.</div>
+  </section>
+
+  <!-- ═══════ RAG PIPELINE ═══════ -->
+  <section class="section" id="rag">
+    <h2>⚙️ The RAG Pipeline</h2>
+    <p>RAG stands for <strong>Retrieval-Augmented Generation</strong>. Instead of fine-tuning a model (expensive, slow), you retrieve relevant chunks of the user's documents at query time and feed them as context to GPT. This is the core of the entire app.</p>
+
+    <h3>1. Ingestion Pipeline (runs when user uploads a file)</h3>
+    <div class="pipeline">
+      <div class="pipeline-label">Document Ingestion</div>
+      <div class="pipeline-row">
+        <div class="pipe-box">📄 File Upload<div class="sub">PDF / TXT / DOCX</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box">📝 Text Extraction<div class="sub">pdf-parse / mammoth</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box">✂️ Chunking<div class="sub">~500 tokens per chunk</div></div>
+      </div>
+      <div class="pipeline-row" style="margin-top:10px">
+        <div class="pipe-box highlight">🔢 Embed Each Chunk<div class="sub">OpenAI text-embedding-3-small</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box highlight">💾 Store in pgvector<div class="sub">vector + chunk text + metadata</div></div>
+      </div>
+    </div>
+
+    <h3>2. Query Pipeline (runs on every chat message)</h3>
+    <div class="pipeline">
+      <div class="pipeline-label">Chat Query</div>
+      <div class="pipeline-row">
+        <div class="pipe-box">💬 User Message<div class="sub">"What's your refund policy?"</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box highlight">🔢 Embed Query<div class="sub">same embedding model</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box highlight">🔍 Vector Search<div class="sub">top 5 similar chunks</div></div>
+      </div>
+      <div class="pipeline-row" style="margin-top:10px">
+        <div class="pipe-box">📋 Build Prompt<div class="sub">system + context chunks + user message</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box highlight">🤖 GPT-4o-mini<div class="sub">generates answer</div></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-box">📨 Response<div class="sub">streamed back to user</div></div>
+      </div>
+    </div>
+
+    <h3>Key Concepts</h3>
+
+    <h4>Chunking</h4>
+    <p>You can't send an entire 50-page PDF to GPT — it's too many tokens and costs too much. Instead you split the document into overlapping chunks of ~500 tokens each. Overlap (e.g. 50 tokens) ensures you don't lose context at chunk boundaries.</p>
+    <pre>// Simple chunking with overlap
+function chunkText(text, chunkSize = 500, overlap = 50) {
+  const words = text.split(' ');
+  const chunks = [];
+  for (let i = 0; i &lt; words.length; i += chunkSize - overlap) {
+    chunks.push(words.slice(i, i + chunkSize).join(' '));
+    if (i + chunkSize >= words.length) break;
+  }
+  return chunks;
+}</pre>
+
+    <h4>Embeddings</h4>
+    <p>An embedding is a list of numbers (a vector) that represents the meaning of a piece of text. Two pieces of text with similar meanings will have vectors that are mathematically close to each other. This is how you do semantic search — "refund" will match "money back guarantee" even though the words are different.</p>
+
+    <h4>The System Prompt</h4>
+    <p>This is the most important part of the chat quality. Build it like this:</p>
+    <pre>const systemPrompt = `You are ${chatbot.name}, a helpful assistant for ${chatbot.companyName}.
+Answer questions based ONLY on the context provided below.
+If the answer is not in the context, say "I don't have information about that."
+Be concise, friendly, and accurate.
+
+Context:
+${retrievedChunks.join('\n\n')}
+`;</pre>
+
+    <div class="warn"><span class="info-icon">⚠️</span><strong>Important:</strong> Always tell GPT to answer ONLY from the provided context. Without this, it will hallucinate answers from its training data, which is not what you want for a business chatbot.</div>
+  </section>
+
+  <!-- ═══════ FEATURES ═══════ -->
+  <section class="section" id="features">
+    <h2>📋 Feature Scope</h2>
+
+    <div class="phase-card">
+      <div class="phase-header">
+        <div class="phase-dot mvp"></div>
+        <div class="ph-title">Phase 1 — MVP (Build this first, ship this)</div>
+        <span class="ph-tag mvp">Must Have</span>
+      </div>
+      <div class="phase-body">
+        <ul>
+          <li>User register + login (JWT auth)</li>
+          <li>Create a chatbot (name, description, welcome message)</li>
+          <li>Upload documents — PDF and TXT support</li>
+          <li>Document ingestion pipeline (chunk → embed → store in pgvector)</li>
+          <li>Chat interface in dashboard (test your bot)</li>
+          <li>Public chat page at <code>/chat/[botId]</code> — shareable link</li>
+          <li>Embeddable widget — one script tag, floating bubble</li>
+          <li>Dashboard overview — list of your chatbots</li>
+          <li>Delete chatbot + delete documents</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-header">
+        <div class="phase-dot polish"></div>
+        <div class="ph-title">Phase 2 — Polish (makes it look impressive)</div>
+        <span class="ph-tag polish">Nice to Have</span>
+      </div>
+      <div class="phase-body">
+        <ul>
+          <li>DOCX file support (using mammoth)</li>
+          <li>Streaming responses (GPT streams tokens as they generate — feels faster)</li>
+          <li>Conversation history — bot remembers the last N messages</li>
+          <li>Stats dashboard — total messages, documents, conversations</li>
+          <li>Chatbot customisation — accent color, avatar, position (bottom-left or right)</li>
+          <li>Source citations — bot shows which document it pulled the answer from</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase-card">
+      <div class="phase-header">
+        <div class="phase-dot stretch"></div>
+        <div class="ph-title">Phase 3 — Stretch Goals (only if time permits)</div>
+        <span class="ph-tag stretch">Bonus</span>
+      </div>
+      <div class="phase-body">
+        <ul>
+          <li>Usage limits — e.g. 100 messages/month on free tier</li>
+          <li>Allowed domains — restrict embed to specific website URLs</li>
+          <li>Export conversations to CSV</li>
+          <li>Webhook on new conversation — notify the business owner by email</li>
+          <li>URL ingestion — paste a URL and scrape its content instead of uploading a file</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ TECH STACK ═══════ -->
+  <section class="section" id="stack">
+    <h2>🔧 Tech Stack</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>React + TypeScript + Vite</td><td>Fast dev server, strong typing for complex data</td></tr>
+          <tr><td>Styling</td><td>Tailwind CSS + shadcn/ui</td><td>Polished components fast — Button, Dialog, Table, Form</td></tr>
+          <tr><td>Backend</td><td>Node.js + Express</td><td>Consistent with your other projects</td></tr>
+          <tr><td>Database</td><td>PostgreSQL via Supabase</td><td>Free tier, relational, built-in pgvector</td></tr>
+          <tr><td>ORM</td><td>Prisma</td><td>Type-safe queries, easy schema migrations</td></tr>
+          <tr><td>Vector store</td><td>Supabase pgvector</td><td>Same DB — no extra service to manage</td></tr>
+          <tr><td>AI — Chat</td><td>OpenAI gpt-4o-mini</td><td>Fast, cheap, great quality for Q&A tasks</td></tr>
+          <tr><td>AI — Embeddings</td><td>OpenAI text-embedding-3-small</td><td>Best price/performance for embeddings</td></tr>
+          <tr><td>PDF parsing</td><td>pdf-parse (npm)</td><td>Lightweight, no native dependencies</td></tr>
+          <tr><td>DOCX parsing</td><td>mammoth (npm)</td><td>Converts Word docs to plain text cleanly</td></tr>
+          <tr><td>File uploads</td><td>multer (npm)</td><td>Express middleware for multipart/form-data</td></tr>
+          <tr><td>Auth</td><td>JWT + bcrypt</td><td>Same pattern as your other projects</td></tr>
+          <tr><td>Embed widget</td><td>Vanilla JS (no framework)</td><td>Must load fast on any third-party site — no React</td></tr>
+          <tr><td>Deployment</td><td>Vercel (frontend) + Render (backend)</td><td>Free tiers, easy CI/CD from GitHub</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════ DATABASE SCHEMA ═══════ -->
+  <section class="section" id="schema">
+    <h2>🗄️ Database Schema</h2>
+    <pre>// schema.prisma
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  password  String     // bcrypt hash
+  name      String?
+  createdAt DateTime   @default(now())
+  chatbots  Chatbot[]
+}
+
+model Chatbot {
+  id             String     @id @default(cuid())
+  userId         String
+  user           User       @relation(fields: [userId], references: [id])
+  name           String
+  description    String?
+  welcomeMessage String     @default("Hi! How can I help you?")
+  accentColor    String     @default("#6366f1")
+  createdAt      DateTime   @default(now())
+  documents      Document[]
+  conversations  Conversation[]
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  chatbotId  String
+  chatbot    Chatbot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+  filename   String
+  fileType   String   // "pdf" | "txt" | "docx"
+  chunkCount Int
+  createdAt  DateTime @default(now())
+  chunks     Chunk[]
+}
+
+model Chunk {
+  id         String   @id @default(cuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  content    String   // the raw text of this chunk
+  embedding  Float[]  // pgvector column — 1536 dimensions for text-embedding-3-small
+  chunkIndex Int
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  chatbotId String
+  chatbot   Chatbot   @relation(fields: [chatbotId], references: [id])
+  createdAt DateTime  @default(now())
+  messages  Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String       // "user" | "assistant"
+  content        String
+  createdAt      DateTime     @default(now())
+}</pre>
+
+    <div class="info"><span class="info-icon">ℹ️</span>The <code>embedding Float[]</code> column uses Supabase's pgvector extension. You need to enable it in Supabase with: <code>CREATE EXTENSION IF NOT EXISTS vector;</code> and then alter the column type to <code>vector(1536)</code> via a raw SQL migration.</div>
+  </section>
+
+  <!-- ═══════ API ENDPOINTS ═══════ -->
+  <section class="section" id="endpoints">
+    <h2>🔌 API Endpoints</h2>
+
+    <h3>Auth</h3>
+    <div class="endpoint"><span class="method post">POST</span><div><div class="endpoint-path">/api/auth/register</div><div class="endpoint-desc">Create account — body: { name, email, password }</div></div></div>
+    <div class="endpoint"><span class="method post">POST</span><div><div class="endpoint-path">/api/auth/login</div><div class="endpoint-desc">Login — returns JWT token</div></div></div>
+    <div class="endpoint"><span class="method get">GET</span><div><div class="endpoint-path">/api/auth/me</div><div class="endpoint-desc">Get current user (protected)</div></div></div>
+
+    <h3>Chatbots</h3>
+    <div class="endpoint"><span class="method get">GET</span><div><div class="endpoint-path">/api/chatbots</div><div class="endpoint-desc">List all chatbots for the logged-in user</div></div></div>
+    <div class="endpoint"><span class="method post">POST</span><div><div class="endpoint-path">/api/chatbots</div><div class="endpoint-desc">Create a new chatbot — body: { name, description, welcomeMessage }</div></div></div>
+    <div class="endpoint"><span class="method get">GET</span><div><div class="endpoint-path">/api/chatbots/:id</div><div class="endpoint-desc">Get one chatbot (public — used by the embed widget)</div></div></div>
+    <div class="endpoint"><span class="method put">PUT</span><div><div class="endpoint-path">/api/chatbots/:id</div><div class="endpoint-desc">Update chatbot settings (protected)</div></div></div>
+    <div class="endpoint"><span class="method delete">DEL</span><div><div class="endpoint-path">/api/chatbots/:id</div><div class="endpoint-desc">Delete chatbot + all its documents and chunks (protected)</div></div></div>
+
+    <h3>Documents</h3>
+    <div class="endpoint"><span class="method get">GET</span><div><div class="endpoint-path">/api/chatbots/:id/documents</div><div class="endpoint-desc">List documents uploaded to this chatbot</div></div></div>
+    <div class="endpoint"><span class="method post">POST</span><div><div class="endpoint-path">/api/chatbots/:id/documents</div><div class="endpoint-desc">Upload a file — multipart/form-data. Triggers full ingestion pipeline.</div></div></div>
+    <div class="endpoint"><span class="method delete">DEL</span><div><div class="endpoint-path">/api/documents/:docId</div><div class="endpoint-desc">Delete a document and all its chunks from the vector store</div></div></div>
+
+    <h3>Chat</h3>
+    <div class="endpoint"><span class="method post">POST</span><div><div class="endpoint-path">/api/chatbots/:id/chat</div><div class="endpoint-desc">Send a message — body: { message, conversationId? }. Returns AI response. Public endpoint (used by embed widget).</div></div></div>
+    <div class="endpoint"><span class="method get">GET</span><div><div class="endpoint-path">/api/chatbots/:id/conversations</div><div class="endpoint-desc">List past conversations for this chatbot (protected)</div></div></div>
+  </section>
+
+  <!-- ═══════ BUILD ORDER ═══════ -->
+  <section class="section" id="build-order">
+    <h2>🏗️ Build Order</h2>
+    <p>Follow this sequence — each step builds on the last. Don't jump ahead.</p>
+
+    <ol class="build-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Project setup</div>
+          <div class="step-desc">Create Vite React app + Express server in a monorepo. Set up Supabase project, enable pgvector extension, connect Prisma. Configure .env with DB URL + OpenAI API key.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Auth — register + login</div>
+          <div class="step-desc">User model in Prisma. POST /register hashes password with bcrypt. POST /login returns JWT. JWT middleware to protect routes. Frontend: Login + Register pages.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Chatbot CRUD</div>
+          <div class="step-desc">Create/list/delete chatbots. Dashboard page listing all the user's bots. "New chatbot" modal form.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">File upload + text extraction</div>
+          <div class="step-desc">multer middleware for file upload. Use pdf-parse for PDFs and mammoth for DOCX. Return raw text string from each file type.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Chunking + embedding pipeline</div>
+          <div class="step-desc">Split extracted text into 500-token chunks with 50-token overlap. Call OpenAI text-embedding-3-small for each chunk. Batch these calls — don't call one by one. Save chunks + embeddings to Supabase pgvector.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">Chat endpoint (the core feature)</div>
+          <div class="step-desc">Embed the incoming user message. Run vector similarity search in pgvector to retrieve top 5 relevant chunks. Build the system prompt with those chunks as context. Call gpt-4o-mini. Return the response.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">7</div>
+        <div class="step-body">
+          <div class="step-title">Chat UI in dashboard</div>
+          <div class="step-desc">A clean chat interface inside the dashboard for testing the bot. Shows messages in a scrollable list, input at the bottom, loading state while GPT responds.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">8</div>
+        <div class="step-body">
+          <div class="step-title">Public chat page</div>
+          <div class="step-desc">A standalone page at /chat/:botId — no login required. Anyone with the link can chat with the bot. This is what gets embedded in the widget.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">9</div>
+        <div class="step-body">
+          <div class="step-title">Embed widget</div>
+          <div class="step-desc">A small vanilla JS file (widget.js) hosted on your server. When loaded on a third-party site, it injects a floating chat bubble. On click, opens an iframe pointing to /chat/:botId. User copies a single script tag from the dashboard to embed it.</div>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">10</div>
+        <div class="step-body">
+          <div class="step-title">Streaming responses (Phase 2)</div>
+          <div class="step-desc">Switch gpt-4o-mini call to stream: true. Use Server-Sent Events (SSE) or chunked transfer to stream tokens to the frontend. React renders each token as it arrives — much better UX.</div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ═══════ CLAUDE DESIGN SCREENS ═══════ -->
+  <section class="section" id="design-screens">
+    <h2>🎨 Claude Design — Screens to Design First</h2>
+    <p>Design these in Claude Design before writing any frontend code. Export the handoff bundle, then pass to Claude Code.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Screen</th><th>Key Elements</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td>Sidebar nav, chatbot cards grid (name, doc count, message count, "Open" + "Settings" buttons), "New Chatbot" button</td></tr>
+          <tr><td>Chatbot Detail</td><td>Two columns — left: document list with upload button + delete per doc; right: live chat test window</td></tr>
+          <tr><td>Chat Interface</td><td>Scrollable message list (user right / bot left), text input + send button, bot name + avatar in header</td></tr>
+          <tr><td>Embed Page</td><td>Code snippet with copy button, preview of the widget bubble, domain settings</td></tr>
+          <tr><td>Public Chat Widget</td><td>Minimal — just the chat UI without any dashboard chrome. Used inside the iframe.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Claude Design prompt</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Design a SaaS dashboard for an AI chatbot builder platform. Sidebar nav on the left with: Dashboard, My Chatbots, Settings. Main area shows a grid of chatbot cards — each card has the bot name, number of documents, number of messages, and two buttons: Open and Settings. Top right has a prominent 'New Chatbot' button. Style: clean, minimal, similar to Intercom or Crisp. Use white background, slate grey sidebar, and indigo accent color."</p>
+    </div>
+  </section>
+
+  <!-- ═══════ AI PROMPTS ═══════ -->
+  <section class="section" id="prompts">
+    <h2>🤖 AI Prompts to Use With Claude Code</h2>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Supabase pgvector setup</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"I'm using Prisma with Supabase PostgreSQL. How do I enable pgvector and store embeddings as a vector(1536) column in my Chunk model? Show me the raw SQL migration and the Prisma schema setup."</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Document ingestion pipeline</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Write a Node.js function called ingestDocument(file, chatbotId) that: (1) extracts text from a PDF using pdf-parse or DOCX using mammoth, (2) splits the text into chunks of ~500 words with 50-word overlap, (3) calls OpenAI text-embedding-3-small to embed each chunk in batches of 20, (4) saves each chunk with its embedding to Supabase pgvector using Prisma."</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Chat endpoint with RAG</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Write an Express POST /api/chatbots/:id/chat endpoint that: (1) embeds the incoming user message using OpenAI text-embedding-3-small, (2) runs a pgvector similarity search to get the top 5 most relevant chunks for this chatbot, (3) builds a system prompt with those chunks as context, (4) calls gpt-4o-mini with the conversation history, (5) saves the user message and assistant response to the Conversation/Message models, and (6) returns the response."</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Embed widget</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Write a vanilla JS embed widget (no frameworks) that website owners can drop in with a single script tag. It should inject a floating chat bubble in the bottom-right corner. When clicked, it opens an iframe pointing to https://myapp.com/chat/CHATBOT_ID. The script tag should look like: &lt;script src='https://myapp.com/widget.js' data-chatbot-id='abc123'&gt;&lt;/script&gt;"</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">Streaming response with SSE</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Convert my existing chat endpoint to stream the OpenAI response using Server-Sent Events (SSE). Show me both the Express backend changes (stream: true, res.write for each chunk) and the React frontend changes (reading the SSE stream and appending tokens to the message in state)."</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">pgvector similarity search</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Write a raw SQL query using Supabase pgvector that finds the 5 most similar chunks to a given query embedding vector, filtered by chatbotId. Use the cosine distance operator (&lt;=&gt;). Show me how to run this with Prisma's $queryRaw."</p>
+    </div>
+
+    <div class="prompt-block">
+      <div class="prompt-label">File upload with multer</div>
+      <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+      <p>"Set up multer in Express to handle single file uploads. Accept only PDF, TXT, and DOCX files (reject others with a 400 error). Store the file in memory (not disk) using memoryStorage so I can process it directly without saving to the filesystem."</p>
+    </div>
+  </section>
+
+  <!-- ═══════ DEPLOYMENT ═══════ -->
+  <section class="section" id="deploy">
+    <h2>🚀 Deployment</h2>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>What</th><th>Where</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>React frontend</td><td>Vercel</td><td>Connect GitHub repo, auto-deploys on push to main</td></tr>
+          <tr><td>Express backend</td><td>Render (free)</td><td>Set env vars: DATABASE_URL, OPENAI_API_KEY, JWT_SECRET</td></tr>
+          <tr><td>Database + pgvector</td><td>Supabase (free)</td><td>Enable vector extension in SQL editor before first deploy</td></tr>
+          <tr><td>Embed widget JS file</td><td>Serve from Express</td><td>Static file at /widget.js on your Render backend URL</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warn"><span class="info-icon">⚠️</span><strong>OpenAI costs:</strong> text-embedding-3-small costs ~$0.02 per 1M tokens. A typical 10-page PDF is ~5,000 tokens, so ingesting it costs $0.0001. gpt-4o-mini costs ~$0.15 per 1M input tokens. For a portfolio project with light usage, your total bill will be under $1. Just set a usage limit in your OpenAI dashboard to be safe.</div>
+
+    <p style="margin-top: 32px; color: var(--text-muted); font-size: 13px; text-align: center;">Project 3 of 6 · AI Chatbot Builder · Ryan Tanjaya Portfolio · Updated 2026-05-30</p>
+  </section>
+
+</main>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  function copyPrompt(btn) {
+    const text = btn.closest('.prompt-block').querySelector('p').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+  }
+  const scrollBtn = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => scrollBtn.classList.toggle('visible', window.scrollY > 400));
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe && sections.forEach(s => {
+    new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' }).observe(s);
+  });
+</script>
+</body>
+</html>
