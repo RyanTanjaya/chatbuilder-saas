@@ -8,6 +8,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
+import ComingSoon from '@/pages/ComingSoon';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
   const user = useAuth((s) => s.user);
@@ -42,6 +43,7 @@ export default function App() {
             </RedirectIfAuthed>
           }
         />
+
         <Route
           path="/"
           element={
@@ -50,6 +52,56 @@ export default function App() {
             </RequireAuth>
           }
         />
+        <Route path="/chatbots" element={<Navigate to="/" replace />} />
+        <Route
+          path="/chatbots/:id"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Chatbot detail" step="Step 8" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/chatbots/:id/settings"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Chatbot settings" step="Step 11" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/conversations"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Conversations" step="Step 11" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/stats"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Analytics" step="Step 11" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Account" step="Step 11" />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/embed"
+          element={
+            <RequireAuth>
+              <ComingSoon title="Embed" step="Step 10" />
+            </RequireAuth>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { env } from './lib/env.js';
 import { authRouter } from './routes/auth.js';
+import { chatbotsRouter } from './routes/chatbots.js';
 
 const app = express();
 
@@ -22,8 +23,8 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/chatbots', chatbotsRouter);
 // Future route mounts:
-// app.use('/api/chatbots', chatbotsRouter);
 // app.use('/api/documents', documentsRouter);
 
 app.listen(env.PORT, () => {
