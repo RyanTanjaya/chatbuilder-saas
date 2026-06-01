@@ -5,6 +5,7 @@ import { env } from './lib/env.js';
 import { authRouter } from './routes/auth.js';
 import { chatbotsRouter } from './routes/chatbots.js';
 import { documentsRouter } from './routes/documents.js';
+import { chatRouter } from './routes/chat.js';
 
 const app = express();
 
@@ -28,6 +29,9 @@ app.use('/api/chatbots', chatbotsRouter);
 // documentsRouter handles both /api/chatbots/:id/documents (list, upload) and
 // /api/documents/:id (delete). Mounted at /api so both paths resolve.
 app.use('/api', documentsRouter);
+// chatRouter serves POST /api/chatbots/:id/chat (public — backs the dashboard
+// test window, public chat page, and embed widget alike).
+app.use('/api', chatRouter);
 
 app.listen(env.PORT, () => {
   console.log(`[chatbuilder] api listening on http://localhost:${env.PORT}`);
