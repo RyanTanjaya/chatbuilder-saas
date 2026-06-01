@@ -4,6 +4,7 @@ import cors from 'cors';
 import { env } from './lib/env.js';
 import { authRouter } from './routes/auth.js';
 import { chatbotsRouter } from './routes/chatbots.js';
+import { documentsRouter } from './routes/documents.js';
 
 const app = express();
 
@@ -24,8 +25,9 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/chatbots', chatbotsRouter);
-// Future route mounts:
-// app.use('/api/documents', documentsRouter);
+// documentsRouter handles both /api/chatbots/:id/documents (list, upload) and
+// /api/documents/:id (delete). Mounted at /api so both paths resolve.
+app.use('/api', documentsRouter);
 
 app.listen(env.PORT, () => {
   console.log(`[chatbuilder] api listening on http://localhost:${env.PORT}`);
