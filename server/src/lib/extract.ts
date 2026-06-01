@@ -52,9 +52,14 @@ export async function extractText(buffer: Buffer, fileType: FileType): Promise<E
       break;
     }
   }
-  // Normalise whitespace: collapse 3+ newlines, strip carriage returns,
-  // trim trailing spaces per line. Keeps chunking deterministic in step 6.
+  // Normalise:
+  // - strip NUL bytes (postgres TEXT rejects them; some PDFs ship them)
+  // - strip other C0 control chars except tab/newline
+  // - collapse \r\n -> \n, trailing spaces per line, 3+ newlines -> 2
+  // Keeps chunking deterministic in step 6.
   const text = raw
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\x00\x01-\x08\x0B\x0C\x0E-\x1F]/g, '')
     .replace(/\r\n?/g, '\n')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')

@@ -13,6 +13,7 @@ import {
   MAX_FILE_SIZE_BYTES,
   SUPPORTED_EXTENSIONS,
 } from '../lib/extract.js';
+import { ingestDocument } from '../services/ingest.js';
 
 export const documentsRouter = Router();
 
@@ -108,8 +109,30 @@ documentsRouter.post(
         filename: file.originalname,
         fileType,
         byteSize: file.size,
-        chunkCount: 0, // populated in step 6 by the ingestion pipeline
+        chunkCount: 0, // updated by ingestDocument once chunks are persisted
       },
+    });
+
+    // Full ingestion pipeline: chunk → batch-embed → insert chunks. If this
+    // fails (e.g. OpenAI is down) we roll back by deleting the Document so
+    // the user can retry cleanly rather than ending up with an unsearchable
+    // half-ingested file.
+    let ingest;
+    try {
+      ingest = await ingestDocument({
+        documentId: doc.id,
+        chatbotId: found.bot.id,
+        text: extracted.text,
+      });
+    } catch (err) {
+      await prisma.document.delete({ where: { id: doc.id } }).catch(() => {});
+      const message =
+        err instanceof Error ? err.message : 'Embedding pipeline failed.';
+      return res.status(502).json({ error: `Could not embed this file: ${message}` });
+    }
+
+    const fresh = await prisma.document.findUnique({
+      where: { id: doc.id },
       select: {
         id: true,
         filename: true,
@@ -119,14 +142,12 @@ documentsRouter.post(
         createdAt: true,
       },
     });
-
-    // For now we hand back the extracted preview so the upcoming chunker can
-    // be wired and tested end-to-end. In step 6 we'll persist Chunk rows here.
     res.status(201).json({
-      document: doc,
+      document: fresh,
       extraction: {
-        charCount: extracted.charCount,
-        wordCount: extracted.wordCount,
+        charCount: ingest.charCount,
+        wordCount: ingest.wordCount,
+        chunkCount: ingest.chunkCount,
         preview: extracted.text.slice(0, 280),
       },
     });
