@@ -10,8 +10,11 @@ import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import MyChatbots from '@/pages/MyChatbots';
 import ChatbotDetail from '@/pages/ChatbotDetail';
+import Settings from '@/pages/Settings';
 import PublicChat from '@/pages/PublicChat';
 import Embed from '@/pages/Embed';
+import Stats from '@/pages/Stats';
+import Conversations from '@/pages/Conversations';
 import ComingSoon from '@/pages/ComingSoon';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
@@ -79,7 +82,7 @@ export default function App() {
           path="/chatbots/:id/settings"
           element={
             <RequireAuth>
-              <ComingSoon title="Chatbot settings" step="Step 11" />
+              <Settings />
             </RequireAuth>
           }
         />
@@ -87,7 +90,7 @@ export default function App() {
           path="/conversations"
           element={
             <RequireAuth>
-              <ComingSoon title="Conversations" step="Step 11" />
+              <Conversations />
             </RequireAuth>
           }
         />
@@ -95,7 +98,7 @@ export default function App() {
           path="/stats"
           element={
             <RequireAuth>
-              <ComingSoon title="Analytics" step="Step 11" />
+              <Stats />
             </RequireAuth>
           }
         />

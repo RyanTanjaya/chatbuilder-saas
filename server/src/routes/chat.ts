@@ -7,7 +7,7 @@ import { Router, type Request, type Response } from 'express';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
-import { answerQuestion, type ChatTurn } from '../services/rag.js';
+import { streamAnswer, type ChatTurn, type RagStream } from '../services/rag.js';
 
 export const chatRouter = Router();
 
@@ -57,9 +57,12 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
     .reverse()
     .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
 
-  let result;
+  // Kick off generation. This resolves once the model connection is open, so a
+  // bad API key, an embedding failure, etc. still surface as a clean JSON 502
+  // — we only switch to SSE once we know tokens are actually coming.
+  let stream: RagStream;
   try {
-    result = await answerQuestion({
+    stream = await streamAnswer({
       bot: { id: bot.id, name: bot.name },
       question: message,
       history,
@@ -71,9 +74,55 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
       .json({ error: `The assistant is unavailable right now: ${detail}` });
   }
 
+  // From here on the response is a Server-Sent Events stream: a `meta` frame
+  // with the conversation id, a run of `delta` frames carrying answer tokens,
+  // then a terminal `done` (with sources) or `error` frame.
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no', // ask nginx-style proxies not to buffer the stream
+  });
+
+  const send = (event: string, data: unknown) => {
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  };
+
+  // If the visitor closes the tab mid-answer, abort the OpenAI request so we
+  // stop paying for tokens nobody will read — and skip persisting a half-turn.
+  let aborted = false;
+  req.on('close', () => {
+    if (!res.writableEnded) {
+      aborted = true;
+      stream.abort();
+    }
+  });
+
+  send('meta', { conversationId: conversation.id });
+
+  let answer = '';
+  try {
+    for await (const delta of stream.textStream) {
+      if (aborted) break;
+      answer += delta;
+      send('delta', { text: delta });
+    }
+  } catch {
+    if (!aborted) {
+      send('error', { message: 'The assistant stopped responding. Please try again.' });
+    }
+    return res.end();
+  }
+
+  if (aborted) return res.end();
+
+  if (!answer.trim()) {
+    answer = "Sorry, I couldn't generate a response. Please try again.";
+  }
+
   // Persist the turn (user + assistant) atomically and bump the conversation so
   // it sorts to the top of any "recent conversations" list. We only write once
-  // generation succeeds, so a transient OpenAI failure leaves no orphan rows.
+  // the answer is complete, so an aborted or failed stream leaves no orphan rows.
   const [, assistant] = await prisma.$transaction([
     prisma.message.create({
       data: { conversationId: conversation.id, role: 'user', content: message },
@@ -82,8 +131,8 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
       data: {
         conversationId: conversation.id,
         role: 'assistant',
-        content: result.answer,
-        sources: result.sources as unknown as Prisma.InputJsonValue,
+        content: answer,
+        sources: stream.sources as unknown as Prisma.InputJsonValue,
       },
     }),
     prisma.conversation.update({
@@ -92,13 +141,6 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
     }),
   ]);
 
-  res.json({
-    conversationId: conversation.id,
-    message: {
-      role: 'assistant',
-      content: assistant.content,
-      sources: result.sources,
-      createdAt: assistant.createdAt,
-    },
-  });
+  send('done', { sources: stream.sources, createdAt: assistant.createdAt });
+  res.end();
 });

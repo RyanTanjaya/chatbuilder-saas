@@ -4,7 +4,7 @@
 // opens is served by this app, so the snippet carries both origins.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Bot, Check, Code2, Copy } from 'lucide-react';
+import { Check, Code2, Copy } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Button } from '@/components/ui/Button';
 import { useChatbots } from '@/stores/chatbots';

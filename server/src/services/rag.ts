@@ -2,14 +2,21 @@
 //   1. embed the question (text-embedding-3-small)
 //   2. cosine-search the chatbot's chunks via pgvector's `<=>` operator
 //   3. build a system prompt that pins the model to the retrieved context
-//   4. ask gpt-4o-mini, threading in the recent conversation history
-// Returns the answer plus the de-duplicated source documents so the UI can
-// show citations. Persistence lives in the route, not here.
+//   4. stream the answer from gpt-4o-mini, threading in recent history
+// Hands the route a token stream plus the de-duplicated source documents so the
+// UI can render citations once the answer lands. Persistence lives in the route.
 import { prisma } from '../lib/prisma.js';
 import { openai, CHAT_MODEL } from '../lib/openai.js';
 import { embedQuery } from './embeddings.js';
 
 const TOP_K = 5;
+
+// Cosine-distance ceiling (pgvector `<=>`, range 0–2) for a chunk to count as a
+// *citable* source. The model still sees every retrieved chunk, but we only
+// surface a document as a "Source" when it sits genuinely close to the question
+// — so an off-topic question (which retrieves only distant chunks and earns an
+// "I don't have that information" reply) shows no misleading citations.
+const RELEVANCE_THRESHOLD = 0.7;
 
 export interface RetrievedChunk {
   id: string;
@@ -29,9 +36,15 @@ export interface ChatSource {
   filename: string;
 }
 
-export interface RagAnswer {
-  answer: string;
+export interface RagStream {
+  // De-duplicated source documents, ready for the route to emit once the answer
+  // completes. Filtered by relevance, so a refusal carries no citations.
   sources: ChatSource[];
+  // The answer, token by token.
+  textStream: AsyncIterable<string>;
+  // Aborts the underlying OpenAI request — call it if the client disconnects so
+  // we stop paying for tokens nobody will read.
+  abort: () => void;
 }
 
 // Top-K cosine search scoped to a single chatbot. The denormalised
@@ -103,6 +116,7 @@ function collectSources(chunks: RetrievedChunk[]): ChatSource[] {
   const seen = new Set<string>();
   const sources: ChatSource[] = [];
   for (const c of chunks) {
+    if (c.distance > RELEVANCE_THRESHOLD) continue;
     if (!seen.has(c.documentId)) {
       seen.add(c.documentId);
       sources.push({ documentId: c.documentId, filename: c.filename });
@@ -111,11 +125,15 @@ function collectSources(chunks: RetrievedChunk[]): ChatSource[] {
   return sources;
 }
 
-export async function answerQuestion(args: {
+// Streaming RAG answer. The returned promise resolves once the model connection
+// is open, so embedding/retrieval/connection failures surface as a normal
+// rejection *before* the route commits to an SSE response. After that the
+// route pulls tokens off `textStream` and forwards them to the client.
+export async function streamAnswer(args: {
   bot: { id: string; name: string };
   question: string;
   history: ChatTurn[]; // prior turns, oldest-first, excluding the current question
-}): Promise<RagAnswer> {
+}): Promise<RagStream> {
   const queryEmbedding = await embedQuery(args.question);
   const chunks = await retrieveChunks(args.bot.id, queryEmbedding);
   const systemPrompt = buildSystemPrompt(args.bot, chunks);
@@ -123,6 +141,7 @@ export async function answerQuestion(args: {
   const completion = await openai.chat.completions.create({
     model: CHAT_MODEL,
     temperature: 0.3,
+    stream: true,
     messages: [
       { role: 'system', content: systemPrompt },
       ...args.history.map((m) => ({ role: m.role, content: m.content })),
@@ -130,9 +149,16 @@ export async function answerQuestion(args: {
     ],
   });
 
-  const answer =
-    completion.choices[0]?.message?.content?.trim() ||
-    "Sorry, I couldn't generate a response. Please try again.";
+  async function* tokens(): AsyncGenerator<string> {
+    for await (const part of completion) {
+      const delta = part.choices[0]?.delta?.content;
+      if (delta) yield delta;
+    }
+  }
 
-  return { answer, sources: collectSources(chunks) };
+  return {
+    sources: collectSources(chunks),
+    textStream: tokens(),
+    abort: () => completion.controller.abort(),
+  };
 }

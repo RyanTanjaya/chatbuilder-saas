@@ -6,6 +6,7 @@ import { authRouter } from './routes/auth.js';
 import { chatbotsRouter } from './routes/chatbots.js';
 import { documentsRouter } from './routes/documents.js';
 import { chatRouter } from './routes/chat.js';
+import { analyticsRouter } from './routes/analytics.js';
 
 const app = express();
 
@@ -40,6 +41,8 @@ app.use('/api', documentsRouter);
 // chatRouter serves POST /api/chatbots/:id/chat (public — backs the dashboard
 // test window, public chat page, and embed widget alike).
 app.use('/api', chatRouter);
+// analyticsRouter serves owner-only GET /api/stats and /api/conversations[/:id].
+app.use('/api', analyticsRouter);
 
 app.listen(env.PORT, () => {
   console.log(`[chatbuilder] api listening on http://localhost:${env.PORT}`);

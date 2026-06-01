@@ -4,10 +4,9 @@
 // prop-driven so the public chat page (step 9) can reuse it verbatim.
 import { useEffect, useRef, useState } from 'react';
 import { Bot, Send, FileText } from 'lucide-react';
-import { api } from '@/lib/api';
-import { normaliseError } from '@/lib/errors';
+import { streamChat } from '@/lib/chatStream';
 import { cn } from '@/lib/utils';
-import type { ChatMessage, ChatResponse } from '@/types/chat';
+import type { ChatMessage } from '@/types/chat';
 
 interface ChatPanelProps {
   chatbotId: string;
@@ -109,38 +108,52 @@ export function ChatPanel({
     if (taRef.current) taRef.current.style.height = 'auto';
     setBusy(true);
 
+    // Accumulated answer text — the stream delivers it token by token.
+    let acc = '';
+    const fail = (message: string) =>
+      setMsgs((m) =>
+        m.map((x) =>
+          x.id === typingId
+            ? { id: typingId, role: 'assistant', content: message, error: true }
+            : x
+        )
+      );
+
     try {
-      const { data } = await api.post<ChatResponse>(`/chatbots/${chatbotId}/chat`, {
-        message: text,
-        conversationId: convoRef.current ?? undefined,
-      });
-      convoRef.current = data.conversationId;
-      setMsgs((m) =>
-        m.map((x) =>
-          x.id === typingId
-            ? {
-                id: typingId,
-                role: 'assistant',
-                content: data.message.content,
-                sources: data.message.sources,
-              }
-            : x
-        )
+      await streamChat(
+        chatbotId,
+        { message: text, conversationId: convoRef.current ?? undefined },
+        {
+          onMeta: ({ conversationId }) => {
+            if (conversationId) convoRef.current = conversationId;
+          },
+          onDelta: (delta) => {
+            acc += delta;
+            setMsgs((m) =>
+              m.map((x) =>
+                x.id === typingId ? { ...x, content: acc, pending: false } : x
+              )
+            );
+          },
+          onDone: ({ sources }) => {
+            setMsgs((m) =>
+              m.map((x) =>
+                x.id === typingId
+                  ? {
+                      ...x,
+                      content: acc || "Sorry, I couldn't generate a response. Please try again.",
+                      pending: false,
+                      sources,
+                    }
+                  : x
+              )
+            );
+          },
+          onError: (message) => fail(message || 'Sorry, something went wrong. Please try again.'),
+        }
       );
-    } catch (err) {
-      const { message } = normaliseError(err);
-      setMsgs((m) =>
-        m.map((x) =>
-          x.id === typingId
-            ? {
-                id: typingId,
-                role: 'assistant',
-                content: message || 'Sorry, something went wrong. Please try again.',
-                error: true,
-              }
-            : x
-        )
-      );
+    } catch {
+      fail('Sorry, something went wrong. Please try again.');
     } finally {
       setBusy(false);
     }
