@@ -9,6 +9,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
 import ChatbotDetail from '@/pages/ChatbotDetail';
+import PublicChat from '@/pages/PublicChat';
 import ComingSoon from '@/pages/ComingSoon';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public, no-auth, no-chrome chat page — what the embed iframe loads. */}
+        <Route path="/chat/:id" element={<PublicChat />} />
+
         <Route
           path="/login"
           element={

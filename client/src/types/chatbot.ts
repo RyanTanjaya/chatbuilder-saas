@@ -13,6 +13,17 @@ export interface Chatbot {
   conversationCount: number;
 }
 
+// Minimal projection returned by GET /api/chatbots/:id to unauthenticated
+// callers (public chat page + embed widget). The owner gets a superset.
+export interface PublicChatbot {
+  id: string;
+  name: string;
+  welcomeMessage: string;
+  accentColor: string;
+  position: 'bottom-right' | 'bottom-left';
+  allowedDomains: string[];
+}
+
 export interface NewChatbotInput {
   name: string;
   description?: string;
