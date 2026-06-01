@@ -82,7 +82,7 @@ export default function ChatbotDetail() {
   const actions = (
     <>
       <Button asChild variant="outline" size="sm">
-        <Link to="/embed">
+        <Link to={`/embed?bot=${bot.id}`}>
           <Code2 size={14} /> Embed
         </Link>
       </Button>

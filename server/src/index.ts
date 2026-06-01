@@ -9,15 +9,23 @@ import { chatRouter } from './routes/chat.js';
 
 const app = express();
 
-app.use(
-  cors({
-    origin: env.CLIENT_ORIGIN,
-    credentials: true,
-  })
-);
+// CORS is split: the dashboard/owner endpoints stay locked to the app origin,
+// but the public chatbot config GET (read by the embed widget on arbitrary
+// third-party sites) is opened to any origin. It only ever returns the minimal
+// public projection to unauthenticated callers, so this is safe.
+const appCors = cors({ origin: env.CLIENT_ORIGIN, credentials: true });
+const openCors = cors({ origin: '*' });
+const PUBLIC_CONFIG_PATH = /^\/api\/chatbots\/[^/]+$/;
+
+app.use((req, res, next) => {
+  if (req.method === 'GET' && PUBLIC_CONFIG_PATH.test(req.path)) {
+    return openCors(req, res, next);
+  }
+  return appCors(req, res, next);
+});
 app.use(express.json({ limit: '2mb' }));
 
-// Static embed widget (placeholder until step 10)
+// Serves the embed widget at /widget.js (server/public/widget.js).
 app.use(express.static('public'));
 
 app.get('/health', (_req, res) => {

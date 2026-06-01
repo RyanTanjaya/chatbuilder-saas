@@ -11,6 +11,7 @@ import Dashboard from '@/pages/Dashboard';
 import MyChatbots from '@/pages/MyChatbots';
 import ChatbotDetail from '@/pages/ChatbotDetail';
 import PublicChat from '@/pages/PublicChat';
+import Embed from '@/pages/Embed';
 import ComingSoon from '@/pages/ComingSoon';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
@@ -110,7 +111,7 @@ export default function App() {
           path="/embed"
           element={
             <RequireAuth>
-              <ComingSoon title="Embed" step="Step 10" />
+              <Embed />
             </RequireAuth>
           }
         />
