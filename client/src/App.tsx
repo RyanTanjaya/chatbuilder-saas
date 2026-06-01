@@ -8,6 +8,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
+import MyChatbots from '@/pages/MyChatbots';
 import ChatbotDetail from '@/pages/ChatbotDetail';
 import PublicChat from '@/pages/PublicChat';
 import ComingSoon from '@/pages/ComingSoon';
@@ -57,7 +58,14 @@ export default function App() {
             </RequireAuth>
           }
         />
-        <Route path="/chatbots" element={<Navigate to="/" replace />} />
+        <Route
+          path="/chatbots"
+          element={
+            <RequireAuth>
+              <MyChatbots />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/chatbots/:id"
           element={

@@ -34,8 +34,8 @@ export default function ChatbotDetail() {
       <Shell title="Chatbot not found">
         <div className="bg-surface border border-border rounded-card p-12 text-center text-text-muted">
           We couldn&apos;t find that chatbot.{' '}
-          <Link className="text-primary-dark font-semibold" to="/">
-            Back to dashboard
+          <Link className="text-primary-dark font-semibold" to="/chatbots">
+            Back to chatbots
           </Link>
         </div>
       </Shell>
@@ -50,7 +50,7 @@ export default function ChatbotDetail() {
     )
       return;
     await remove(bot.id);
-    navigate('/');
+    navigate('/chatbots');
   };
 
   const isLive = bot.documentCount > 0;
@@ -58,7 +58,7 @@ export default function ChatbotDetail() {
   const header = (
     <div>
       <div className="flex items-center gap-1.5 text-[13px] text-text-muted mb-1">
-        <Link to="/" className="hover:text-text transition-colors">
+        <Link to="/chatbots" className="hover:text-text transition-colors">
           Chatbots
         </Link>
         <ChevronRight size={14} />
