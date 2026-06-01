@@ -1,8 +1,8 @@
 // ChatBuilder API — Express entry point.
-// Routes are mounted in subsequent steps (auth → chatbots → documents → chat).
 import express from 'express';
 import cors from 'cors';
 import { env } from './lib/env.js';
+import { authRouter } from './routes/auth.js';
 
 const app = express();
 
@@ -21,8 +21,8 @@ app.get('/health', (_req, res) => {
   res.json({ ok: true, env: env.NODE_ENV, time: new Date().toISOString() });
 });
 
+app.use('/api/auth', authRouter);
 // Future route mounts:
-// app.use('/api/auth', authRouter);
 // app.use('/api/chatbots', chatbotsRouter);
 // app.use('/api/documents', documentsRouter);
 

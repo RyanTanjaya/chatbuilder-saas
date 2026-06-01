@@ -1,38 +1,55 @@
-// Top-level router. Real routes are wired up in Step 3 (auth) onward.
+// Router + global auth hydration. On first mount we ask the server who we are
+// (if we have a JWT lying around in localStorage) so the user doesn't see a
+// login redirect flash on a hard refresh.
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from '@/stores/auth';
+import { RequireAuth } from '@/components/RequireAuth';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import Dashboard from '@/pages/Dashboard';
 
-function ScaffoldPlaceholder() {
-  return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="max-w-md w-full bg-surface border border-border rounded-card p-8 shadow-md text-center">
-        <div className="mx-auto w-12 h-12 rounded-card bg-primary text-white flex items-center justify-center mb-4 text-xl font-bold">
-          C
-        </div>
-        <h1 className="text-2xl font-bold text-text-strong mb-2">ChatBuilder</h1>
-        <p className="text-text-muted text-sm">
-          Scaffold is up. Routes &amp; pages land in the next steps.
-        </p>
-        <div className="mt-6 flex gap-2 justify-center flex-wrap text-xs text-text-muted">
-          <span className="px-2 py-1 rounded-pill bg-primary-light text-primary-dark font-semibold">
-            Vite + React
-          </span>
-          <span className="px-2 py-1 rounded-pill bg-success-soft text-success font-semibold">
-            Tailwind ready
-          </span>
-          <span className="px-2 py-1 rounded-pill bg-accent-purple-soft text-accent-purple font-semibold">
-            shadcn next
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
+  const user = useAuth((s) => s.user);
+  const loading = useAuth((s) => s.loading);
+  if (loading) return null;
+  if (user) return <Navigate to="/" replace />;
+  return <>{children}</>;
 }
 
 export default function App() {
+  const hydrate = useAuth((s) => s.hydrate);
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ScaffoldPlaceholder />} />
+        <Route
+          path="/login"
+          element={
+            <RedirectIfAuthed>
+              <Login />
+            </RedirectIfAuthed>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RedirectIfAuthed>
+              <Register />
+            </RedirectIfAuthed>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
