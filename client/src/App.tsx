@@ -8,6 +8,7 @@ import { RequireAuth } from '@/components/RequireAuth';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import Dashboard from '@/pages/Dashboard';
+import ChatbotDetail from '@/pages/ChatbotDetail';
 import ComingSoon from '@/pages/ComingSoon';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
@@ -57,7 +58,7 @@ export default function App() {
           path="/chatbots/:id"
           element={
             <RequireAuth>
-              <ComingSoon title="Chatbot detail" step="Step 8" />
+              <ChatbotDetail />
             </RequireAuth>
           }
         />
