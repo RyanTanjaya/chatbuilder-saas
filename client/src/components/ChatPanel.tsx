@@ -52,7 +52,7 @@ function Bubble({ m, accentColor }: { m: ChatMessage; accentColor: string }) {
         <div
           className={cn(
             'rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words',
-            m.error ? 'bg-danger-soft text-danger' : 'bg-slate-100 text-text'
+            m.error ? 'bg-danger-soft text-danger' : 'bg-surface-muted text-text'
           )}
         >
           {m.pending ? <TypingDots /> : m.content}

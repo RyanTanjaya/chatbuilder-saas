@@ -12,7 +12,7 @@ const buttonVariants = cva(
       variant: {
         primary:
           'bg-primary text-white shadow-sm hover:bg-primary-dark',
-        ghost: 'bg-transparent text-text hover:bg-slate-100',
+        ghost: 'bg-transparent text-text hover:bg-surface-muted',
         outline:
           'bg-surface text-text border-border hover:bg-bg hover:border-border-strong',
         danger:

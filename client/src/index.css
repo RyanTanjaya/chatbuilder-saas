@@ -4,7 +4,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Neutral design tokens live as RGB channel triples so Tailwind can apply
+   opacity modifiers (e.g. bg-bg/85) via rgb(var(--x) / <alpha-value>). The
+   .dark class — toggled on <html> by the UI store — swaps the whole palette.
+   Brand/status colors (primary, accent, danger…) stay fixed; they read well
+   on both surfaces. */
 @layer base {
+  :root {
+    --bg: 248 250 252; /* #f8fafc */
+    --surface: 255 255 255; /* #ffffff */
+    --surface-muted: 241 245 249; /* #f1f5f9 (slate-100) */
+    --text: 51 65 85; /* #334155 */
+    --text-strong: 15 23 42; /* #0f172a */
+    --text-muted: 100 116 139; /* #64748b */
+    --border: 226 232 240; /* #e2e8f0 */
+    --border-strong: 203 213 225; /* #cbd5e1 */
+    color-scheme: light;
+  }
+  .dark {
+    --bg: 11 18 32; /* #0b1220 */
+    --surface: 30 41 59; /* #1e293b (slate-800) */
+    --surface-muted: 51 65 85; /* #334155 (slate-700) */
+    --text: 203 213 225; /* #cbd5e1 (slate-300) */
+    --text-strong: 248 250 252; /* #f8fafc */
+    --text-muted: 148 163 184; /* #94a3b8 (slate-400) */
+    --border: 51 65 85; /* #334155 (slate-700) */
+    --border-strong: 71 85 105; /* #475569 (slate-600) */
+    color-scheme: dark;
+  }
+
   html,
   body,
   #root {
@@ -17,7 +45,7 @@
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    @apply bg-primary-light;
+    @apply bg-primary-light text-primary-dark;
   }
 }
 

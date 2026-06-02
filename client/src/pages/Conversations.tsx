@@ -39,7 +39,7 @@ function TranscriptMessage({ m, accentColor }: { m: ConversationMessage; accentC
         <Bot size={17} />
       </span>
       <div className="min-w-0 max-w-[80%]">
-        <div className="rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words bg-slate-100 text-text">
+        <div className="rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words bg-surface-muted text-text">
           {m.content}
         </div>
         {m.sources && m.sources.length > 0 && (

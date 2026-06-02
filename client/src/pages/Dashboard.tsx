@@ -52,7 +52,7 @@ function BarChartCard({
                 <span className="font-medium text-text-strong truncate pr-3">{d.name}</span>
                 <span className="text-text-muted tabular-nums flex-none">{d.value}</span>
               </div>
-              <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+              <div className="h-2.5 rounded-full bg-surface-muted overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -89,7 +89,7 @@ export default function Dashboard() {
   if (!loaded) {
     return (
       <Shell title="Dashboard" subtitle="Your workspace at a glance">
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-[120px] rounded-card bg-surface border border-border animate-pulse" />
           ))}
@@ -113,7 +113,7 @@ export default function Dashboard() {
 
   return (
     <Shell title="Dashboard" subtitle="Your workspace at a glance" actions={actions}>
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <StatTile icon={Bot} color="indigo" num={list.length} label="Total Chatbots" />
         <StatTile icon={FileText} color="purple" num={totalDocs} label="Total Documents" />
         <StatTile

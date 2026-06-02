@@ -24,12 +24,12 @@ export function BotCard({ bot }: BotCardProps) {
         {bot.description || <span className="italic text-text-muted/70">No description yet.</span>}
       </div>
 
-      <div className="flex gap-2 my-3.5">
-        <span className="inline-flex items-center gap-1.5 h-[26px] px-2.5 rounded-pill bg-slate-100 text-text text-xs font-semibold">
+      <div className="flex flex-wrap gap-2 my-3.5">
+        <span className="inline-flex items-center gap-1.5 h-[26px] px-2.5 rounded-pill bg-surface-muted text-text text-xs font-semibold">
           <FileText size={13} />
           {bot.documentCount} {bot.documentCount === 1 ? 'doc' : 'docs'}
         </span>
-        <span className="inline-flex items-center gap-1.5 h-[26px] px-2.5 rounded-pill bg-slate-100 text-text text-xs font-semibold">
+        <span className="inline-flex items-center gap-1.5 h-[26px] px-2.5 rounded-pill bg-surface-muted text-text text-xs font-semibold">
           <MessageSquare size={13} />
           {bot.conversationCount}{' '}
           {bot.conversationCount === 1 ? 'convo' : 'convos'}

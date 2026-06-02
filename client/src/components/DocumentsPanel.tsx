@@ -19,7 +19,7 @@ interface DocumentsPanelProps {
 const TYPE_STYLE: Record<DocumentMeta['fileType'], string> = {
   pdf: 'bg-danger-soft text-danger',
   docx: 'bg-primary-light text-primary-dark',
-  txt: 'bg-slate-100 text-text-muted',
+  txt: 'bg-surface-muted text-text-muted',
   url: 'bg-success-soft text-success',
 };
 
@@ -162,7 +162,7 @@ export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
         <div className="mt-4 space-y-2">
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-[58px] rounded-lg bg-slate-100 animate-pulse" />
+              <div key={i} className="h-[58px] rounded-lg bg-surface-muted animate-pulse" />
             ))
           ) : docs.length === 0 ? (
             <div className="text-center text-sm text-text-muted py-8">

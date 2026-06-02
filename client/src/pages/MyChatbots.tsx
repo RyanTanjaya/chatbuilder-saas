@@ -57,7 +57,7 @@ export default function MyChatbots() {
         actions={actions}
       >
         {loading && !loaded ? (
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
@@ -84,7 +84,7 @@ export default function MyChatbots() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {filtered.map((b) => (
               <BotCard key={b.id} bot={b} />
             ))}
@@ -94,7 +94,7 @@ export default function MyChatbots() {
                 onClick={() => setCreating(true)}
                 className="border-2 border-dashed border-border-strong rounded-card text-text-muted hover:border-primary hover:text-primary-dark hover:bg-primary/5 transition-colors min-h-[230px] flex flex-col items-center justify-center gap-2"
               >
-                <span className="grid place-items-center w-[46px] h-[46px] rounded-full bg-slate-100 group-hover:bg-primary-light">
+                <span className="grid place-items-center w-[46px] h-[46px] rounded-full bg-surface-muted group-hover:bg-primary-light">
                   <Plus size={22} />
                 </span>
                 <span className="font-semibold mt-1">Create new chatbot</span>

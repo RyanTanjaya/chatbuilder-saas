@@ -265,7 +265,7 @@ export default function Settings() {
                 </div>
               </div>
               <div className="flex-1 p-3">
-                <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-100 px-3 py-2 text-[13px] leading-relaxed text-text">
+                <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-surface-muted px-3 py-2 text-[13px] leading-relaxed text-text">
                   {welcomeMessage.trim() || 'Hi! How can I help you?'}
                 </div>
               </div>

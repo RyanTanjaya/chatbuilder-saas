@@ -15,7 +15,7 @@ import PublicChat from '@/pages/PublicChat';
 import Embed from '@/pages/Embed';
 import Stats from '@/pages/Stats';
 import Conversations from '@/pages/Conversations';
-import ComingSoon from '@/pages/ComingSoon';
+import Account from '@/pages/Account';
 
 function RedirectIfAuthed({ children }: { children: React.ReactNode }) {
   const user = useAuth((s) => s.user);
@@ -106,7 +106,7 @@ export default function App() {
           path="/account"
           element={
             <RequireAuth>
-              <ComingSoon title="Account" step="Step 11" />
+              <Account />
             </RequireAuth>
           }
         />

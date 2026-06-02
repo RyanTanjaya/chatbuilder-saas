@@ -18,18 +18,21 @@ export default {
           800: '#1e293b',
           700: '#334155',
         },
-        // Text
+        // Text — channel triples so opacity modifiers still work; flips with .dark
         text: {
-          DEFAULT: '#334155',
-          strong: '#0f172a',
-          muted: '#64748b',
+          DEFAULT: 'rgb(var(--text) / <alpha-value>)',
+          strong: 'rgb(var(--text-strong) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
         },
         // Surfaces
-        surface: '#ffffff',
-        bg: '#f8fafc',
+        surface: {
+          DEFAULT: 'rgb(var(--surface) / <alpha-value>)',
+          muted: 'rgb(var(--surface-muted) / <alpha-value>)',
+        },
+        bg: 'rgb(var(--bg) / <alpha-value>)',
         border: {
-          DEFAULT: '#e2e8f0',
-          strong: '#cbd5e1',
+          DEFAULT: 'rgb(var(--border) / <alpha-value>)',
+          strong: 'rgb(var(--border-strong) / <alpha-value>)',
         },
         // Status
         success: { DEFAULT: '#10b981', soft: '#d1fae5' },

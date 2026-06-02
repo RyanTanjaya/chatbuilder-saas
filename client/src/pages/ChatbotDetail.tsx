@@ -71,7 +71,7 @@ export default function ChatbotDetail() {
             <span className="w-1.5 h-1.5 rounded-full bg-success" /> Live
           </span>
         ) : (
-          <span className="inline-flex items-center h-6 px-2.5 rounded-pill bg-slate-100 text-text-muted text-xs font-semibold">
+          <span className="inline-flex items-center h-6 px-2.5 rounded-pill bg-surface-muted text-text-muted text-xs font-semibold">
             Draft
           </span>
         )}

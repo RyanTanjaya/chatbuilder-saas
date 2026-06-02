@@ -36,7 +36,7 @@ export default function Stats() {
   if (!loaded) {
     return (
       <Shell title="Stats" subtitle="Usage across all your chatbots">
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="h-[120px] rounded-card bg-surface border border-border animate-pulse" />
           ))}
@@ -78,7 +78,7 @@ export default function Stats() {
 
   return (
     <Shell title="Stats" subtitle="Usage across all your chatbots">
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <StatTile
           icon={MessagesSquare}
           color="indigo"
@@ -118,7 +118,7 @@ export default function Stats() {
                     {b.messages.toLocaleString()} msg
                   </span>
                 </div>
-                <div className="h-2.5 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-2.5 rounded-full bg-surface-muted overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{

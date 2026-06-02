@@ -7,9 +7,10 @@ interface BrandProps {
   size?: 'sm' | 'md';
   className?: string;
   variant?: 'light' | 'dark'; // dark = navy sidebar context (white name text)
+  compact?: boolean; // hide the wordmark, render just the icon (collapsed sidebar)
 }
 
-export function Brand({ size = 'md', className, variant = 'light' }: BrandProps) {
+export function Brand({ size = 'md', className, variant = 'light', compact = false }: BrandProps) {
   const boxSize = size === 'sm' ? 'w-7 h-7' : 'w-[34px] h-[34px]';
   const iconSize = size === 'sm' ? 16 : 19;
   const sparkleSize = size === 'sm' ? 10 : 13;
@@ -30,9 +31,11 @@ export function Brand({ size = 'md', className, variant = 'light' }: BrandProps)
           <Sparkles size={sparkleSize} fill="currentColor" />
         </span>
       </span>
-      <span className={cn('font-extrabold tracking-tight', nameSize, nameColor)}>
-        Chat<b>Builder</b>
-      </span>
+      {!compact && (
+        <span className={cn('font-extrabold tracking-tight', nameSize, nameColor)}>
+          Chat<b>Builder</b>
+        </span>
+      )}
     </div>
   );
 }
