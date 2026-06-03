@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ChatBuilder — Editorial color variations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #f5f1e8; color: #1c1d1b; padding: 56px 40px; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #888d83; font-weight: 600; }
+  h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 38px; letter-spacing: -.02em; margin: 8px 0 10px; }
+  .lede { color: #474a46; font-size: 15.5px; line-height: 1.55; max-width: 600px; margin-bottom: 40px; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #fffdf8; border: 1px solid #e6ddcd; border-radius: 16px; overflow: hidden; transition: transform .16s ease, box-shadow .16s ease; box-shadow: 0 1px 2px rgba(28,29,27,.04), 0 22px 36px -30px rgba(28,29,27,.25); }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(28,29,27,.04), 0 28px 44px -28px rgba(28,29,27,.32); }
+  .swatch { height: 96px; display: flex; align-items: center; gap: 10px; padding: 0 22px; }
+  .dot { width: 26px; height: 26px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+  .swatch .bars { display: flex; align-items: flex-end; gap: 5px; height: 46px; margin-left: auto; }
+  .swatch .bars i { width: 9px; border-radius: 3px 3px 0 0; display: block; }
+  .body { padding: 18px 22px 22px; }
+  .body h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; }
+  .body h2 em { font-style: italic; }
+  .body p { color: #474a46; font-size: 13.5px; line-height: 1.5; margin-top: 5px; }
+  .hex { margin-top: 12px; font-size: 11.5px; color: #888d83; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+
+  .teal   { --a:#0f6e66; --b:#2f9b90; }
+  .indigo { --a:#3b3d80; --b:#6c6ec2; }
+  .plum   { --a:#7c2f50; --b:#ab5479; }
+  .forest { --a:#2f6b46; --b:#57a06f; }
+  .swatch.teal,.swatch.indigo,.swatch.plum,.swatch.forest { background: color-mix(in srgb, var(--a) 7%, #fffdf8); }
+  .dot { background: var(--a); }
+  .swatch .bars i:nth-child(1){height:55%;background:var(--b)} .swatch .bars i:nth-child(2){height:78%;background:var(--a)}
+  .swatch .bars i:nth-child(3){height:64%;background:var(--b)} .swatch .bars i:nth-child(4){height:92%;background:var(--a)}
+  .body h2 em { color: var(--a); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">ChatBuilder · Editorial — color study</div>
+  <h1>Four ways to wear it</h1>
+  <p class="lede">Same Editorial layout, four accent palettes on the warm cream paper. Click any card to open the full dashboard. The teal is the current pick; indigo, plum, and forest are the new options you asked for.</p>
+  <div class="grid">
+    <a class="card teal" href="b-editorial.html">
+      <div class="swatch teal"><span class="dot"></span><div class="bars"><i></i><i></i><i></i><i></i></div></div>
+      <div class="body"><h2>Teal <em>· current</em></h2><p>Fresh, modern, premium. Reads clearly editorial without any orange.</p><div class="hex">#0F6E66 → #2F9B90</div></div>
+    </a>
+    <a class="card indigo" href="editorial-indigo.html">
+      <div class="swatch indigo"><span class="dot"></span><div class="bars"><i></i><i></i><i></i><i></i></div></div>
+      <div class="body"><h2>Ink <em>· indigo</em></h2><p>Calm, intellectual, trustworthy. The "serious publication" feel.</p><div class="hex">#3B3D80 → #6C6EC2</div></div>
+    </a>
+    <a class="card plum" href="editorial-plum.html">
+      <div class="swatch plum"><span class="dot"></span><div class="bars"><i></i><i></i><i></i><i></i></div></div>
+      <div class="body"><h2>Plum <em>· wine</em></h2><p>Warm, refined, a little luxe. Boutique / editorial-fashion energy.</p><div class="hex">#7C2F50 → #AB5479</div></div>
+    </a>
+    <a class="card forest" href="editorial-forest.html">
+      <div class="swatch forest"><span class="dot"></span><div class="bars"><i></i><i></i><i></i><i></i></div></div>
+      <div class="body"><h2>Forest <em>· green</em></h2><p>Grounded, organic, calm. Pairs naturally with the cream paper.</p><div class="hex">#2F6B46 → #57A06F</div></div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

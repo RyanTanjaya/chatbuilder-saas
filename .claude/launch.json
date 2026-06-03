@@ -13,6 +13,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev:client"],
       "port": 5173
+    },
+    {
+      "name": "designs",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["design-explorations/serve.cjs"],
+      "port": 4180
     }
   ]
 }

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ChatBuilder — Editorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f5f1e8;
+    --paper-2: #fffdf8;
+    --ink: #1c1d1b;
+    --ink-2: #474a46;
+    --ink-faint: #888d83;
+    --line: #e6ddcd;
+    --line-2: #d8cfbb;
+    --accent: #0f6e66;        /* deep teal */
+    --accent-2: #2f9b90;      /* light teal — for gradients */
+    --accent-soft: #dcebe7;   /* pale teal tint */
+    --forest: #5a7d4f;        /* sage — success */
+    --forest-soft: #e7eee0;
+    --gold: #a8791f;          /* ochre — escalated */
+    --gold-soft: #f1e6cd;
+    --blue: #3a5b8c;
+    --plum: #7a4a73;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  .num { font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; }
+
+  .app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+  /* Sidebar */
+  .side { background: var(--paper-2); border-right: 1px solid var(--line); padding: 26px 18px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 2px 6px 26px; }
+  .logo { width: 40px; height: 40px; border-radius: 12px; background: var(--ink); color: var(--paper-2); display: grid; place-items: center; }
+  .logo svg { width: 21px; height: 21px; }
+  .brand b { font-family: 'Fraunces'; font-weight: 600; font-size: 20px; letter-spacing: -.01em; }
+  .sect { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); padding: 18px 8px 10px; font-weight: 600; }
+  .nav { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; color: var(--ink-2); font-size: 14px; cursor: pointer; transition: .15s; }
+  .nav svg { width: 18px; height: 18px; }
+  .nav:hover { background: var(--paper); }
+  .nav.on { background: var(--ink); color: var(--paper-2); font-weight: 500; }
+  .nav .badge { margin-left: auto; font-size: 11px; font-weight: 600; background: var(--accent-soft); color: var(--accent); padding: 1px 8px; border-radius: 999px; }
+  .nav.on .badge { background: rgba(255,255,255,.18); color: #fff; }
+  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 11px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .av { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 13px; background: var(--accent); color: #fff; font-family: 'Fraunces'; }
+  .side-foot .n { font-size: 13.5px; font-weight: 600; }
+  .side-foot .e { font-size: 12px; color: var(--ink-faint); }
+
+  /* Main */
+  .main { padding: 0 0 60px; min-width: 0; }
+  .top { display: flex; align-items: flex-end; gap: 20px; padding: 32px 40px 26px; border-bottom: 1px solid var(--line); }
+  .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .top h1 { font-family: 'Fraunces'; font-weight: 600; font-size: 36px; letter-spacing: -.02em; margin-top: 6px; line-height: 1; }
+  .top h1 em { font-style: italic; color: var(--accent); }
+  .top .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .search { display: flex; align-items: center; gap: 9px; background: var(--paper-2); border: 1px solid var(--line-2); padding: 11px 15px; border-radius: 10px; color: var(--ink-faint); font-size: 13px; width: 230px; }
+  .search svg { width: 16px; height: 16px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; padding: 12px 18px; border-radius: 10px; border: 0; cursor: pointer; background: var(--ink); color: var(--paper-2); }
+  .btn svg { width: 16px; height: 16px; }
+
+  .wrap { padding: 30px 40px 0; }
+  .grid { display: grid; gap: 22px; }
+
+  /* KPIs — editorial number-forward */
+  .kpis { grid-template-columns: repeat(4,1fr); border: 1px solid var(--line); border-radius: 16px; background: var(--paper-2); overflow: hidden; box-shadow: 0 1px 2px rgba(28,29,27,.04), 0 22px 36px -28px rgba(28,29,27,.22); }
+  .kpi { padding: 22px 24px; border-right: 1px solid var(--line); }
+  .kpi:last-child { border-right: 0; }
+  .kpi .label { font-size: 12.5px; color: var(--ink-faint); display: flex; align-items: center; gap: 7px; }
+  .kpi .label svg { width: 14px; height: 14px; color: var(--accent); }
+  .kpi .val { font-family: 'Fraunces'; font-weight: 600; font-size: 38px; letter-spacing: -.02em; margin: 8px 0 4px; line-height: 1; }
+  .kpi .sub { font-size: 12px; color: var(--ink-2); }
+  .kpi .sub b { color: var(--forest); font-weight: 600; }
+
+  .row2 { grid-template-columns: 1.9fr 1fr; margin-top: 22px; }
+  .panel { background: var(--paper-2); border: 1px solid var(--line); border-radius: 16px; padding: 24px; box-shadow: 0 1px 2px rgba(28,29,27,.04), 0 22px 36px -28px rgba(28,29,27,.22); }
+  .p-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+  .p-head h3 { font-family: 'Fraunces'; font-weight: 600; font-size: 19px; }
+  .p-head .sub { font-size: 12.5px; color: var(--ink-faint); }
+  .p-head .legend { font-size: 12px; color: var(--ink-faint); }
+  .p-head .legend i { width: 9px; height: 9px; border-radius: 2px; background: var(--accent); display: inline-block; margin-right: 6px; }
+  .chart { margin-top: 20px; }
+  .bars { display: flex; align-items: flex-end; gap: 14px; height: 180px; padding-top: 8px; }
+  .bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+  .bar .col { width: 100%; max-width: 34px; border-radius: 7px 7px 0 0; background: linear-gradient(180deg,var(--accent-2),var(--accent)); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+  .bar .col.mut { background: var(--line-2); }
+  .bar .d { font-size: 11px; color: var(--ink-faint); }
+
+  .usage .figure { text-align: center; padding: 8px 0 14px; }
+  .usage .figure .big { font-family: 'Fraunces'; font-weight: 600; font-size: 46px; letter-spacing: -.02em; line-height: 1; }
+  .usage .figure .cap { font-size: 12.5px; color: var(--ink-faint); margin-top: 6px; }
+  .track { height: 10px; border-radius: 999px; background: var(--paper); border: 1px solid var(--line); overflow: hidden; }
+  .track > div { height: 100%; width: 64%; background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
+  .ustat { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--line-2); }
+  .ustat div .k { font-size: 11.5px; color: var(--ink-faint); }
+  .ustat div .v { font-family: 'Fraunces'; font-weight: 600; font-size: 20px; margin-top: 2px; }
+
+  .row3 { grid-template-columns: 1.5fr 1fr; margin-top: 22px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .sec-head h2 { font-family: 'Fraunces'; font-weight: 600; font-size: 22px; letter-spacing: -.01em; }
+  .sec-head a { font-size: 13px; color: var(--accent); text-decoration: none; }
+
+  .bot { display: flex; align-items: center; gap: 15px; padding: 15px 10px; border-bottom: 1px solid var(--line); border-radius: 10px; transition: background .15s ease; cursor: pointer; }
+  .bot:hover { background: var(--paper); }
+  .bot:last-child { border-bottom: 0; }
+  .bot .ba { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; color: #fff; }
+  .bot .ba svg { width: 21px; height: 21px; }
+  .bot .info { flex: 1; min-width: 0; }
+  .bot .nm { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+  .bot .mt { font-size: 12.5px; color: var(--ink-faint); margin-top: 2px; }
+  .status { font-size: 10.5px; font-weight: 600; padding: 2px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .02em; }
+  .status i { width: 6px; height: 6px; border-radius: 50%; }
+  .live { color: var(--forest); background: var(--forest-soft); } .live i { background: var(--forest); }
+  .draft { color: var(--ink-faint); background: var(--paper); } .draft i { background: var(--ink-faint); }
+  .bot .convos { text-align: right; }
+  .bot .convos .c { font-family: 'Fraunces'; font-weight: 600; font-size: 19px; }
+  .bot .convos .l { font-size: 11px; color: var(--ink-faint); }
+
+  .convo { padding: 13px 10px; border-bottom: 1px solid var(--line); border-radius: 10px; transition: background .15s ease; cursor: pointer; }
+  .convo:hover { background: var(--paper); }
+  .convo:last-child { border-bottom: 0; }
+  .convo .q { font-size: 14px; }
+  .convo .q::before { content: '“'; font-family:'Fraunces'; color: var(--accent); font-size: 18px; margin-right: 1px; }
+  .convo .q::after { content: '”'; font-family:'Fraunces'; color: var(--accent); font-size: 18px; }
+  .convo .meta { font-size: 12px; color: var(--ink-faint); margin-top: 5px; display: flex; align-items: center; gap: 8px; }
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .tag.res { color: var(--forest); background: var(--forest-soft); }
+  .tag.esc { color: var(--gold); background: var(--gold-soft); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg></span>
+      <b>ChatBuilder</b>
+    </div>
+    <div class="sect">Workspace</div>
+    <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Dashboard</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>My Chatbots<span class="badge">5</span></div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversations</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>Stats</div>
+    <div class="sect">Settings</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15H4.5a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 6 9.4l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 11 4.6V4.5a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 17 6.6l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 11h.1a2 2 0 0 1 0 4h-.1"/></svg>Account</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Embed</div>
+    <div class="side-foot">
+      <span class="av">SC</span>
+      <div><div class="n">Sarah Chen</div><div class="e">sarah@acme.com</div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <div>
+        <div class="eyebrow">Dashboard</div>
+        <h1>Your workspace, <em>at a glance</em></h1>
+      </div>
+      <div class="right">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Search…</div>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg>New Chatbot</button>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="grid kpis">
+        <div class="kpi">
+          <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>Conversations</div>
+          <div class="val">3,182</div>
+          <div class="sub"><b>↑ 12.4%</b> vs. last month</div>
+        </div>
+        <div class="kpi">
+          <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/></svg>Messages</div>
+          <div class="val">14,920</div>
+          <div class="sub"><b>↑ 8.1%</b> vs. last month</div>
+        </div>
+        <div class="kpi">
+          <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/></svg>Documents</div>
+          <div class="val">51</div>
+          <div class="sub"><b>6 new</b> this week</div>
+        </div>
+        <div class="kpi">
+          <div class="label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Avg. response</div>
+          <div class="val">1.2s</div>
+          <div class="sub"><b>0.3s faster</b> this month</div>
+        </div>
+      </div>
+
+      <div class="grid row2">
+        <div class="panel">
+          <div class="p-head">
+            <div><h3>Conversations this week</h3><div class="sub">Monday – Sunday</div></div>
+            <div class="legend"><i></i>Daily conversations</div>
+          </div>
+          <div class="chart">
+            <div class="bars">
+              <div class="bar"><div class="col" style="height:58%"></div><div class="d">Mon</div></div>
+              <div class="bar"><div class="col" style="height:66%"></div><div class="d">Tue</div></div>
+              <div class="bar"><div class="col" style="height:82%"></div><div class="d">Wed</div></div>
+              <div class="bar"><div class="col" style="height:74%"></div><div class="d">Thu</div></div>
+              <div class="bar"><div class="col" style="height:96%"></div><div class="d">Fri</div></div>
+              <div class="bar"><div class="col mut" style="height:38%"></div><div class="d">Sat</div></div>
+              <div class="bar"><div class="col mut" style="height:46%"></div><div class="d">Sun</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel usage">
+          <div class="p-head"><div><h3>Monthly usage</h3><div class="sub">Resets in 12 days</div></div></div>
+          <div class="figure"><div class="big">64<span style="font-size:24px">%</span></div><div class="cap">3,182 of 5,000 messages</div></div>
+          <div class="track"><div></div></div>
+          <div class="ustat">
+            <div><div class="k">Remaining</div><div class="v">1,818</div></div>
+            <div><div class="k">Resolution</div><div class="v">87%</div></div>
+            <div><div class="k">Active bots</div><div class="v">4</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid row3">
+        <div class="panel">
+          <div class="sec-head"><h2>Your chatbots</h2><a href="#">View all →</a></div>
+          <div class="bot">
+            <span class="ba" style="background:#0f6e66"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg></span>
+            <div class="info"><div class="nm">Acme Support <span class="status live"><i></i>Live</span></div><div class="mt">8 documents · active 2m ago</div></div>
+            <div class="convos"><div class="c">1,284</div><div class="l">conversations</div></div>
+          </div>
+          <div class="bot">
+            <span class="ba" style="background:#5a7d4f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>
+            <div class="info"><div class="nm">API Reference Bot <span class="status live"><i></i>Live</span></div><div class="mt">23 documents · active 5m ago</div></div>
+            <div class="convos"><div class="c">891</div><div class="l">conversations</div></div>
+          </div>
+          <div class="bot">
+            <span class="ba" style="background:#3a5b8c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/></svg></span>
+            <div class="info"><div class="nm">Docs Assistant <span class="status live"><i></i>Live</span></div><div class="mt">12 documents · active 1h ago</div></div>
+            <div class="convos"><div class="c">642</div><div class="l">conversations</div></div>
+          </div>
+          <div class="bot">
+            <span class="ba" style="background:#a8791f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg></span>
+            <div class="info"><div class="nm">Sales Inquiry <span class="status live"><i></i>Live</span></div><div class="mt">5 documents · active 3h ago</div></div>
+            <div class="convos"><div class="c">318</div><div class="l">conversations</div></div>
+          </div>
+          <div class="bot">
+            <span class="ba" style="background:#7a4a73"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+            <div class="info"><div class="nm">Onboarding Helper <span class="status draft"><i></i>Draft</span></div><div class="mt">3 documents · active 2d ago</div></div>
+            <div class="convos"><div class="c">47</div><div class="l">conversations</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="sec-head"><h2>Recent</h2></div>
+          <div class="convo"><div class="q">How do I reset my API key?</div><div class="meta">Acme Support · 2m ago <span class="tag res">Resolved</span></div></div>
+          <div class="convo"><div class="q">What's the rate limit on the v2 endpoint?</div><div class="meta">API Reference Bot · 8m ago <span class="tag res">Resolved</span></div></div>
+          <div class="convo"><div class="q">Where can I find the webhook docs?</div><div class="meta">Docs Assistant · 23m ago <span class="tag res">Resolved</span></div></div>
+          <div class="convo"><div class="q">Do you offer annual billing discounts?</div><div class="meta">Sales Inquiry · 1h ago <span class="tag esc">Escalated</span></div></div>
+          <div class="convo"><div class="q">My dashboard won't load after login</div><div class="meta">Acme Support · 2h ago <span class="tag res">Resolved</span></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
