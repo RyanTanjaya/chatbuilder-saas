@@ -72,7 +72,7 @@ export default function Register() {
         <div className="flex justify-center mb-6">
           <Brand />
         </div>
-        <h1 className="text-2xl font-extrabold text-text-strong text-center tracking-tight mb-1.5">
+        <h1 className="font-serif text-[28px] font-semibold text-text-strong text-center tracking-tight mb-1.5">
           Create your account
         </h1>
         <p className="text-sm text-text-muted text-center mb-6">
@@ -80,7 +80,7 @@ export default function Register() {
         </p>
 
         {topError ? (
-          <div className="mb-4 rounded-input bg-danger-soft border border-red-200 text-danger text-sm px-3.5 py-2.5">
+          <div className="mb-4 rounded-input bg-danger-soft border border-danger/25 text-danger text-sm px-3.5 py-2.5">
             {topError}
           </div>
         ) : null}
@@ -129,7 +129,7 @@ export default function Register() {
               'mt-0.5 grid place-items-center w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex-none transition-colors',
               agree
                 ? 'bg-primary border-primary text-white'
-                : 'bg-white border-border-strong text-transparent'
+                : 'bg-surface border-border-strong text-transparent'
             )}
           >
             {agree ? <Check size={13} strokeWidth={3} /> : null}
@@ -162,7 +162,7 @@ export default function Register() {
           {submitting ? 'Creating account…' : 'Create account'}
         </Button>
 
-        <div className="flex items-center gap-3.5 my-5 text-xs font-semibold text-slate-400">
+        <div className="flex items-center gap-3.5 my-5 text-xs font-semibold text-text-muted">
           <span className="flex-1 h-px bg-border" />
           or
           <span className="flex-1 h-px bg-border" />

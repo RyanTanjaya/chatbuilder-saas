@@ -62,7 +62,7 @@ export default function Stats() {
           <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
             <MessagesSquare size={24} className="text-primary-dark" />
           </div>
-          <h3 className="text-lg font-bold text-text-strong">No usage data yet</h3>
+          <h3 className="font-serif text-xl font-semibold text-text-strong">No usage data yet</h3>
           <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">
             Create a chatbot and share it — conversations and message volume will show up here.
           </p>
@@ -98,7 +98,7 @@ export default function Stats() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
         {/* Per-bot breakdown */}
         <div className="bg-surface border border-border rounded-card p-5">
-          <div className="text-base font-bold text-text-strong">Per-chatbot breakdown</div>
+          <div className="font-serif text-[17px] font-semibold text-text-strong">Per-chatbot breakdown</div>
           <div className="text-[13px] text-text-muted mb-4">Messages, conversations & documents</div>
           <div className="space-y-4">
             {perBot.map((b) => (
@@ -140,7 +140,7 @@ export default function Stats() {
         <div className="bg-surface border border-border rounded-card p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-base font-bold text-text-strong">Recent conversations</div>
+              <div className="font-serif text-[17px] font-semibold text-text-strong">Recent conversations</div>
               <div className="text-[13px] text-text-muted">Latest threads across all bots</div>
             </div>
             <Button asChild variant="ghost" size="sm">

@@ -33,7 +33,7 @@ export default function MyChatbots() {
   const actions = (
     <>
       <div className="relative w-60">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
           <Search size={18} />
         </span>
         <Input
@@ -74,7 +74,7 @@ export default function MyChatbots() {
             <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
               <Bot size={26} className="text-primary-dark" />
             </div>
-            <h3 className="text-lg font-bold text-text-strong">No chatbots yet</h3>
+            <h3 className="font-serif text-xl font-semibold text-text-strong">No chatbots yet</h3>
             <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">
               Create your first chatbot, upload your documents, and embed it on any
               website in minutes.

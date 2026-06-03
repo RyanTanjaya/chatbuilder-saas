@@ -67,17 +67,22 @@ export function Sidebar() {
         to={item.to}
         title={collapsed ? item.label : undefined}
         className={cn(
-          'flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium text-slate-300',
-          'border-l-[3px] border-transparent transition-colors mb-0.5',
-          'hover:bg-white/5 hover:text-white',
+          'flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-0.5',
           collapsed ? 'justify-center px-0' : 'px-3',
-          active && 'bg-primary/15 text-white border-l-primary font-semibold'
+          active
+            ? 'bg-primary text-white font-semibold shadow-sm'
+            : 'text-text-muted hover:bg-surface-muted hover:text-text-strong'
         )}
       >
         <Icon size={18} className="flex-none" />
         {!collapsed && <span className="flex-1">{item.label}</span>}
         {!collapsed && item.badge != null ? (
-          <span className="bg-white/10 text-slate-200 text-[11px] font-bold px-2 py-0.5 rounded-full">
+          <span
+            className={cn(
+              'text-[11px] font-bold px-2 py-0.5 rounded-full',
+              active ? 'bg-white/20 text-white' : 'bg-surface-muted text-text-muted'
+            )}
+          >
             {item.badge}
           </span>
         ) : null}
@@ -87,10 +92,10 @@ export function Sidebar() {
 
   function renderSectionLabel(label: string) {
     if (collapsed) {
-      return <div className="mx-2 mt-4 mb-1.5 border-t border-white/10" />;
+      return <div className="mx-2 mt-4 mb-1.5 border-t border-border" />;
     }
     return (
-      <div className="px-2.5 mt-4 mb-1.5 text-[11px] font-bold tracking-widest text-slate-500 uppercase">
+      <div className="px-2.5 mt-4 mb-1.5 text-[11px] font-bold tracking-widest text-text-muted/80 uppercase">
         {label}
       </div>
     );
@@ -108,7 +113,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-50 bg-navy text-white flex flex-col transition-[width] duration-200 ease-out',
+        'fixed inset-y-0 left-0 z-50 bg-surface text-text border-r border-border flex flex-col transition-[width] duration-200 ease-out',
         collapsed ? 'w-[76px]' : 'w-[260px]'
       )}
     >
@@ -119,13 +124,13 @@ export function Sidebar() {
           collapsed ? 'flex-col' : 'justify-between'
         )}
       >
-        <Brand variant="dark" compact={collapsed} className={collapsed ? '' : 'pl-2'} />
+        <Brand variant="light" compact={collapsed} className={collapsed ? '' : 'pl-2'} />
         <button
           type="button"
           onClick={toggleSidebar}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="grid place-items-center w-8 h-8 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors flex-none"
+          className="grid place-items-center w-8 h-8 rounded-lg text-text-muted hover:text-text-strong hover:bg-surface-muted transition-colors flex-none"
         >
           {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
         </button>
@@ -139,7 +144,7 @@ export function Sidebar() {
         {settings.map(renderItem)}
       </nav>
 
-      <div className="p-3 border-t border-white/10 space-y-1">
+      <div className="p-3 border-t border-border space-y-1">
         {/* Theme toggle */}
         <button
           type="button"
@@ -147,8 +152,8 @@ export function Sidebar() {
           aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           className={cn(
-            'flex items-center gap-3 w-full py-2.5 rounded-lg text-sm font-medium text-slate-300',
-            'hover:bg-white/5 hover:text-white transition-colors',
+            'flex items-center gap-3 w-full py-2.5 rounded-lg text-sm font-medium text-text-muted',
+            'hover:bg-surface-muted hover:text-text-strong transition-colors',
             collapsed ? 'justify-center px-0' : 'px-3'
           )}
         >
@@ -161,22 +166,22 @@ export function Sidebar() {
           to="/account"
           title={collapsed ? (user?.email ?? 'Account') : undefined}
           className={cn(
-            'flex items-center gap-2.5 py-2 rounded-[10px] hover:bg-white/5 transition-colors',
+            'flex items-center gap-2.5 py-2 rounded-[10px] hover:bg-surface-muted transition-colors',
             collapsed ? 'justify-center px-0' : 'px-2.5'
           )}
         >
           <span
-            className="grid place-items-center w-[34px] h-[34px] rounded-full text-[13px] font-bold text-white flex-none"
-            style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+            className="grid place-items-center w-[34px] h-[34px] rounded-full text-[13px] font-bold text-white flex-none font-serif"
+            style={{ background: 'linear-gradient(135deg,#3b3d80,#6c6ec2)' }}
           >
             {initials || 'U'}
           </span>
           {!collapsed && (
             <span className="min-w-0 flex-1">
-              <div className="text-[13px] font-semibold text-white leading-tight truncate">
+              <div className="text-[13px] font-semibold text-text-strong leading-tight truncate">
                 {user?.name ?? 'You'}
               </div>
-              <div className="text-xs text-slate-400 leading-tight truncate">{user?.email}</div>
+              <div className="text-xs text-text-muted leading-tight truncate">{user?.email}</div>
             </span>
           )}
         </NavLink>

@@ -68,7 +68,7 @@ export default function Embed() {
           <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
             <Code2 size={24} className="text-primary-dark" />
           </div>
-          <h3 className="text-lg font-bold text-text-strong">No chatbots to embed yet</h3>
+          <h3 className="font-serif text-xl font-semibold text-text-strong">No chatbots to embed yet</h3>
           <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">
             Create a chatbot first, then come back here for its embed snippet.
           </p>
@@ -111,7 +111,7 @@ export default function Embed() {
           <div className="bg-surface border border-border rounded-card overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border">
               <div>
-                <div className="text-base font-bold text-text-strong">Embed snippet</div>
+                <div className="font-serif text-[17px] font-semibold text-text-strong">Embed snippet</div>
                 <div className="text-[13px] text-text-muted">
                   Paste this just before the closing <code>&lt;/body&gt;</code> tag.
                 </div>
@@ -127,7 +127,7 @@ export default function Embed() {
           </div>
 
           <div className="bg-surface border border-border rounded-card p-5">
-            <div className="text-base font-bold text-text-strong mb-3">How it works</div>
+            <div className="font-serif text-[17px] font-semibold text-text-strong mb-3">How it works</div>
             <ol className="space-y-2.5 text-sm text-text-muted">
               {[
                 'Copy the snippet above and paste it into your site’s HTML.',
@@ -149,7 +149,7 @@ export default function Embed() {
         {selected ? (
           <div className="bg-surface border border-border rounded-card p-5 flex flex-col">
             <div className="flex items-center justify-between mb-3">
-              <div className="text-base font-bold text-text-strong">Live preview</div>
+              <div className="font-serif text-[17px] font-semibold text-text-strong">Live preview</div>
               <span className="inline-flex items-center gap-1.5 text-[12px] text-text-muted">
                 <span
                   className="w-3 h-3 rounded-full border border-black/10"

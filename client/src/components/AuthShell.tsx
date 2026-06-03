@@ -9,7 +9,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(60% 50% at 50% -8%, rgba(99,102,241,.10), transparent 70%), radial-gradient(40% 40% at 90% 100%, rgba(139,92,246,.08), transparent 70%)',
+            'radial-gradient(60% 50% at 50% -8%, rgba(59,61,128,.10), transparent 70%), radial-gradient(40% 40% at 90% 100%, rgba(122,74,115,.07), transparent 70%)',
         }}
       />
       <div

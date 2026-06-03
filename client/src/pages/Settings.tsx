@@ -16,11 +16,11 @@ import { firstFieldError, normaliseError, type FieldErrors } from '@/lib/errors'
 import { cn } from '@/lib/utils';
 
 const ACCENTS = [
-  { value: '#6366f1', name: 'Indigo' },
-  { value: '#8b5cf6', name: 'Purple' },
-  { value: '#10b981', name: 'Emerald' },
-  { value: '#f59e0b', name: 'Amber' },
-  { value: '#ef4444', name: 'Rose' },
+  { value: '#3b3d80', name: 'Indigo' },
+  { value: '#7a4a73', name: 'Plum' },
+  { value: '#5a7d4f', name: 'Sage' },
+  { value: '#a8791f', name: 'Ochre' },
+  { value: '#3a5b8c', name: 'Slate blue' },
 ];
 
 type Position = 'bottom-right' | 'bottom-left';
@@ -33,7 +33,7 @@ export default function Settings() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [welcomeMessage, setWelcomeMessage] = useState('');
-  const [accentColor, setAccentColor] = useState('#6366f1');
+  const [accentColor, setAccentColor] = useState('#3b3d80');
   const [position, setPosition] = useState<Position>('bottom-right');
 
   const [touched, setTouched] = useState(false);
@@ -128,7 +128,7 @@ export default function Settings() {
         <ChevronRight size={14} />
         <span className="text-text font-medium">Settings</span>
       </div>
-      <h1 className="text-[22px] font-extrabold text-text-strong tracking-tight">Settings</h1>
+      <h1 className="font-serif text-[25px] font-semibold text-text-strong tracking-tight">Settings</h1>
     </div>
   );
 
@@ -244,7 +244,7 @@ export default function Settings() {
 
         {/* Live preview — mirrors the public chat window the widget opens */}
         <div className="bg-surface border border-border rounded-card p-5">
-          <div className="text-base font-bold text-text-strong mb-3">Preview</div>
+          <div className="font-serif text-[17px] font-semibold text-text-strong mb-3">Preview</div>
           <div className="relative rounded-xl bg-bg border border-border overflow-hidden h-[420px]">
             {/* Mini chat window */}
             <div className="absolute inset-3 bottom-20 rounded-lg bg-surface border border-border shadow-card flex flex-col overflow-hidden">

@@ -33,7 +33,7 @@ export function Shell({ title, subtitle, header, actions, children, contentClass
             ) : (
               <>
                 {title ? (
-                  <h1 className="text-[22px] font-extrabold text-text-strong tracking-tight truncate">
+                  <h1 className="font-serif text-[25px] font-semibold text-text-strong tracking-tight truncate">
                     {title}
                   </h1>
                 ) : null}

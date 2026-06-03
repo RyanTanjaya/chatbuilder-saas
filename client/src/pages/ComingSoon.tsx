@@ -15,7 +15,7 @@ export default function ComingSoon({ title, step }: Props) {
         <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
           <Sparkles size={24} className="text-primary-dark" />
         </div>
-        <h2 className="text-lg font-bold text-text-strong">Coming in {step}</h2>
+        <h2 className="font-serif text-xl font-semibold text-text-strong">Coming in {step}</h2>
         <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">
           This screen is part of an upcoming build step. The dashboard and chatbot
           CRUD are live now — keep going to land here.

@@ -156,7 +156,7 @@ export default function Conversations() {
           <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
             <MessagesSquare size={24} className="text-primary-dark" />
           </div>
-          <h3 className="text-lg font-bold text-text-strong">
+          <h3 className="font-serif text-xl font-semibold text-text-strong">
             {botParam ? 'No conversations for this chatbot' : 'No conversations yet'}
           </h3>
           <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">

@@ -40,7 +40,7 @@ function BarChartCard({
 
   return (
     <div className="bg-surface border border-border rounded-card p-5">
-      <div className="text-base font-bold text-text-strong">{title}</div>
+      <div className="font-serif text-[17px] font-semibold text-text-strong">{title}</div>
       <div className="text-[13px] text-text-muted mb-4">{subtitle}</div>
       {data.length === 0 || !hasValues ? (
         <div className="text-sm text-text-muted py-10 text-center">{emptyHint}</div>
@@ -130,7 +130,7 @@ export default function Dashboard() {
           <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
             <Bot size={26} className="text-primary-dark" />
           </div>
-          <h3 className="text-lg font-bold text-text-strong">Nothing to show yet</h3>
+          <h3 className="font-serif text-xl font-semibold text-text-strong">Nothing to show yet</h3>
           <p className="text-sm text-text-muted mt-1.5 max-w-md mx-auto">
             Create your first chatbot to start seeing usage data here.
           </p>

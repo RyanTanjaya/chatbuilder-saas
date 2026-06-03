@@ -46,10 +46,10 @@ export default function PublicChat() {
     return (
       <div className="h-screen grid place-items-center bg-bg px-6 text-center">
         <div>
-          <div className="grid place-items-center w-12 h-12 rounded-full bg-slate-100 text-text-muted mx-auto mb-3">
+          <div className="grid place-items-center w-12 h-12 rounded-full bg-surface-muted text-text-muted mx-auto mb-3">
             <Bot size={24} />
           </div>
-          <h1 className="text-base font-bold text-text-strong">Chatbot unavailable</h1>
+          <h1 className="font-serif text-lg font-semibold text-text-strong">Chatbot unavailable</h1>
           <p className="text-sm text-text-muted mt-1">
             This chatbot doesn&apos;t exist or has been removed.
           </p>

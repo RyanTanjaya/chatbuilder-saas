@@ -19,7 +19,7 @@ export function BotCard({ bot }: BotCardProps) {
       >
         <Bot size={24} />
       </span>
-      <div className="text-base font-bold text-text-strong">{bot.name}</div>
+      <div className="font-serif text-[17px] font-semibold text-text-strong">{bot.name}</div>
       <div className="text-[13px] text-text-muted mt-1 leading-relaxed line-clamp-2 min-h-[38px]">
         {bot.description || <span className="italic text-text-muted/70">No description yet.</span>}
       </div>

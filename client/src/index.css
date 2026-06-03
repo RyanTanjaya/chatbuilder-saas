@@ -11,25 +11,25 @@
    on both surfaces. */
 @layer base {
   :root {
-    --bg: 248 250 252; /* #f8fafc */
-    --surface: 255 255 255; /* #ffffff */
-    --surface-muted: 241 245 249; /* #f1f5f9 (slate-100) */
-    --text: 51 65 85; /* #334155 */
-    --text-strong: 15 23 42; /* #0f172a */
-    --text-muted: 100 116 139; /* #64748b */
-    --border: 226 232 240; /* #e2e8f0 */
-    --border-strong: 203 213 225; /* #cbd5e1 */
+    --bg: 243 233 216; /* #f3e9d8 warm cream */
+    --surface: 255 252 244; /* #fffcf4 warm white */
+    --surface-muted: 236 224 201; /* #ece0c9 */
+    --text: 79 71 58; /* #4f473a */
+    --text-strong: 33 29 22; /* #211d16 */
+    --text-muted: 138 127 108; /* #8a7f6c */
+    --border: 232 220 196; /* #e8dcc4 */
+    --border-strong: 219 206 178; /* #dbceb2 */
     color-scheme: light;
   }
   .dark {
-    --bg: 11 18 32; /* #0b1220 */
-    --surface: 30 41 59; /* #1e293b (slate-800) */
-    --surface-muted: 51 65 85; /* #334155 (slate-700) */
-    --text: 203 213 225; /* #cbd5e1 (slate-300) */
-    --text-strong: 248 250 252; /* #f8fafc */
-    --text-muted: 148 163 184; /* #94a3b8 (slate-400) */
-    --border: 51 65 85; /* #334155 (slate-700) */
-    --border-strong: 71 85 105; /* #475569 (slate-600) */
+    --bg: 26 23 18; /* #1a1712 warm near-black */
+    --surface: 38 33 26; /* #26211a warm charcoal */
+    --surface-muted: 51 45 36; /* #332d24 */
+    --text: 214 205 188; /* #d6cdbc */
+    --text-strong: 245 240 230; /* #f5f0e6 */
+    --text-muted: 156 144 124; /* #9c907c */
+    --border: 56 49 39; /* #383127 */
+    --border-strong: 74 65 52; /* #4a4134 */
     color-scheme: dark;
   }
 
@@ -46,15 +46,5 @@
   }
   ::selection {
     @apply bg-primary-light text-primary-dark;
-  }
-}
-
-@layer utilities {
-  /* Used by the navy sidebar in shell + dashboard */
-  .sidebar-nav-item {
-    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-white/70 rounded-btn transition-colors hover:text-white hover:bg-white/5;
-  }
-  .sidebar-nav-item-active {
-    @apply text-white bg-white/10 border-l-2 border-primary;
   }
 }

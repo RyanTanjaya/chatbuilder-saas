@@ -1,6 +1,7 @@
-// ChatBuilder wordmark — indigo speech-bubble icon with a yellow sparkle accent.
-// Used at the top of the auth cards and the sidebar.
-import { MessageSquare, Sparkles } from 'lucide-react';
+// ChatBuilder wordmark — a serif "C" monogram set in Fraunces on the same 135°
+// indigo gradient used for avatars across the app, with a warm-gold AI spark in
+// the corner. The monogram echoes the serif wordmark so the mark and the name
+// read as one system. Used at the top of the auth cards and the sidebar.
 import { cn } from '@/lib/utils';
 
 interface BrandProps {
@@ -11,28 +12,46 @@ interface BrandProps {
 }
 
 export function Brand({ size = 'md', className, variant = 'light', compact = false }: BrandProps) {
-  const boxSize = size === 'sm' ? 'w-7 h-7' : 'w-[34px] h-[34px]';
-  const iconSize = size === 'sm' ? 16 : 19;
-  const sparkleSize = size === 'sm' ? 10 : 13;
+  const box = size === 'sm' ? 28 : 34;
+  const letterPx = Math.round(box * 0.66);
+  const sparkPx = Math.round(box * 0.36);
   const nameSize = size === 'sm' ? 'text-[15px]' : 'text-[17px]';
   const nameColor = variant === 'dark' ? 'text-white' : 'text-text-strong';
 
   return (
     <div className={cn('flex items-center gap-2.5', className)}>
       <span
-        className={cn(
-          'relative grid place-items-center rounded-[9px] bg-primary text-white shadow-md',
-          boxSize
-        )}
-        style={{ boxShadow: '0 2px 8px rgba(99,102,241,.5)' }}
+        className="relative grid place-items-center rounded-[10px] flex-none"
+        style={{
+          width: box,
+          height: box,
+          background: 'linear-gradient(135deg,#3b3d80,#6c6ec2)',
+          boxShadow: '0 4px 12px -2px rgba(59,61,128,.45)',
+        }}
       >
-        <MessageSquare size={iconSize} />
-        <span className="absolute -top-1.5 -right-1.5 grid place-items-center w-4 h-4 text-yellow-300">
-          <Sparkles size={sparkleSize} fill="currentColor" />
+        <span
+          className="font-serif font-bold leading-none text-[#fffcf4]"
+          style={{ fontSize: letterPx, marginTop: -1 }}
+        >
+          C
         </span>
+        <svg
+          className="absolute"
+          style={{ top: Math.round(box * 0.08), right: Math.round(box * 0.08) }}
+          width={sparkPx}
+          height={sparkPx}
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+        >
+          <path
+            d="M12 2 Q12 12 22 12 Q12 12 12 22 Q12 12 2 12 Q12 12 12 2 Z"
+            fill="#e8a838"
+          />
+        </svg>
       </span>
       {!compact && (
-        <span className={cn('font-extrabold tracking-tight', nameSize, nameColor)}>
+        <span className={cn('font-serif font-semibold tracking-tight', nameSize, nameColor)}>
           Chat<b>Builder</b>
         </span>
       )}

@@ -65,7 +65,7 @@ export default function ChatbotDetail() {
         <span className="text-text font-medium truncate">{bot.name}</span>
       </div>
       <div className="flex items-center gap-3">
-        <h1 className="text-[22px] font-extrabold text-text-strong tracking-tight">{bot.name}</h1>
+        <h1 className="font-serif text-[25px] font-semibold text-text-strong tracking-tight">{bot.name}</h1>
         {isLive ? (
           <span className="inline-flex items-center gap-1.5 h-6 px-2.5 rounded-pill bg-success-soft text-success text-xs font-semibold">
             <span className="w-1.5 h-1.5 rounded-full bg-success" /> Live
@@ -105,7 +105,7 @@ export default function ChatbotDetail() {
         <div className="bg-surface border border-border rounded-card flex flex-col h-[640px] overflow-hidden">
           <div className="flex-none flex items-center justify-between px-5 py-4 border-b border-border">
             <div>
-              <div className="text-base font-bold text-text-strong">Test your bot</div>
+              <div className="font-serif text-[17px] font-semibold text-text-strong">Test your bot</div>
               <div className="text-[13px] text-text-muted">
                 Ask real questions — answers cite their sources
               </div>

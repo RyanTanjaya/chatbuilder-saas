@@ -34,7 +34,7 @@ export function StatTile({ icon: Icon, color, num, label, trend }: StatTileProps
       >
         <Icon size={20} />
       </div>
-      <div className="text-[28px] font-extrabold text-text-strong tracking-tight leading-none">
+      <div className="font-serif text-[32px] font-semibold text-text-strong tracking-tight leading-none tabular-nums">
         {num}
       </div>
       <div className="text-[13px] text-text-muted mt-1.5 font-medium">{label}</div>

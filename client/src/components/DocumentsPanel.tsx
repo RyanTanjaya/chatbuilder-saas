@@ -98,7 +98,7 @@ export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
   return (
     <div className="bg-surface border border-border rounded-card flex flex-col">
       <div className="flex-none px-5 py-4 border-b border-border">
-        <div className="text-base font-bold text-text-strong">Knowledge Base</div>
+        <div className="font-serif text-[17px] font-semibold text-text-strong">Knowledge Base</div>
         <div className="text-[13px] text-text-muted">Documents your bot answers from</div>
       </div>
 

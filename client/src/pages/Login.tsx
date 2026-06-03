@@ -58,7 +58,7 @@ export default function Login() {
         <div className="flex justify-center mb-6">
           <Brand />
         </div>
-        <h1 className="text-2xl font-extrabold text-text-strong text-center tracking-tight mb-1.5">
+        <h1 className="font-serif text-[28px] font-semibold text-text-strong text-center tracking-tight mb-1.5">
           Welcome back
         </h1>
         <p className="text-sm text-text-muted text-center mb-6">
@@ -66,14 +66,14 @@ export default function Login() {
         </p>
 
         {topError ? (
-          <div className="mb-4 rounded-input bg-danger-soft border border-red-200 text-danger text-sm px-3.5 py-2.5">
+          <div className="mb-4 rounded-input bg-danger-soft border border-danger/25 text-danger text-sm px-3.5 py-2.5">
             {topError}
           </div>
         ) : null}
 
         <Field label="Email" htmlFor="email" error={emailErr}>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
               <Mail size={18} />
             </span>
             <Input
@@ -104,7 +104,7 @@ export default function Login() {
           }
         >
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
               <Lock size={18} />
             </span>
             <Input
@@ -124,7 +124,7 @@ export default function Login() {
           {submitting ? 'Signing in…' : 'Sign in'}
         </Button>
 
-        <div className="flex items-center gap-3.5 my-5 text-xs font-semibold text-slate-400">
+        <div className="flex items-center gap-3.5 my-5 text-xs font-semibold text-text-muted">
           <span className="flex-1 h-px bg-border" />
           or
           <span className="flex-1 h-px bg-border" />

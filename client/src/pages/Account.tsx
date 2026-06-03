@@ -55,8 +55,8 @@ export default function Account() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
             <div className="flex items-center gap-4 lg:w-72 lg:flex-none">
               <span
-                className="grid place-items-center w-16 h-16 rounded-full text-xl font-bold text-white flex-none"
-                style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)' }}
+                className="grid place-items-center w-16 h-16 rounded-full text-xl font-bold text-white flex-none font-serif"
+                style={{ background: 'linear-gradient(135deg,#3b3d80,#6c6ec2)' }}
               >
                 {initials || 'U'}
               </span>
@@ -93,14 +93,14 @@ export default function Account() {
         {/* Usage snapshot + Session — side by side on wide screens, equal height */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-5">
           <div className="bg-surface border border-border rounded-card p-6">
-            <div className="text-base font-bold text-text-strong">Workspace usage</div>
+            <div className="font-serif text-[17px] font-semibold text-text-strong">Workspace usage</div>
             <div className="text-[13px] text-text-muted mb-4">Totals across everything you own</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-card border border-border bg-bg p-4">
                 <div className="grid place-items-center w-9 h-9 rounded-lg bg-primary-light text-primary-dark mb-2.5">
                   <Bot size={18} />
                 </div>
-                <div className="text-2xl font-extrabold text-text-strong tabular-nums">
+                <div className="font-serif text-[26px] font-semibold text-text-strong tabular-nums">
                   {usage.chatbots.toLocaleString()}
                 </div>
                 <div className="text-[13px] text-text-muted">Chatbots</div>
@@ -109,7 +109,7 @@ export default function Account() {
                 <div className="grid place-items-center w-9 h-9 rounded-lg bg-primary-light text-primary-dark mb-2.5">
                   <FileText size={18} />
                 </div>
-                <div className="text-2xl font-extrabold text-text-strong tabular-nums">
+                <div className="font-serif text-[26px] font-semibold text-text-strong tabular-nums">
                   {usage.documents.toLocaleString()}
                 </div>
                 <div className="text-[13px] text-text-muted">Documents</div>
@@ -118,7 +118,7 @@ export default function Account() {
                 <div className="grid place-items-center w-9 h-9 rounded-lg bg-primary-light text-primary-dark mb-2.5">
                   <MessageSquare size={18} />
                 </div>
-                <div className="text-2xl font-extrabold text-text-strong tabular-nums">
+                <div className="font-serif text-[26px] font-semibold text-text-strong tabular-nums">
                   {usage.conversations.toLocaleString()}
                 </div>
                 <div className="text-[13px] text-text-muted">Conversations</div>
@@ -127,7 +127,7 @@ export default function Account() {
           </div>
 
           <div className="bg-surface border border-border rounded-card p-6 flex flex-col">
-            <div className="text-base font-bold text-text-strong">Session</div>
+            <div className="font-serif text-[17px] font-semibold text-text-strong">Session</div>
             <div className="text-[13px] text-text-muted mt-0.5">
               Sign out of ChatBuilder on this device.
             </div>

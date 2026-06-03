@@ -20,11 +20,11 @@ import { firstFieldError, normaliseError, type FieldErrors } from '@/lib/errors'
 import { cn } from '@/lib/utils';
 
 const ACCENTS = [
-  { value: '#6366f1', name: 'Indigo' },
-  { value: '#8b5cf6', name: 'Purple' },
-  { value: '#10b981', name: 'Emerald' },
-  { value: '#f59e0b', name: 'Amber' },
-  { value: '#ef4444', name: 'Rose' },
+  { value: '#3b3d80', name: 'Indigo' },
+  { value: '#7a4a73', name: 'Plum' },
+  { value: '#5a7d4f', name: 'Sage' },
+  { value: '#a8791f', name: 'Ochre' },
+  { value: '#3a5b8c', name: 'Slate blue' },
 ];
 
 interface Props {
@@ -39,7 +39,7 @@ export function NewChatbotDialog({ open, onOpenChange }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [welcomeMessage, setWelcomeMessage] = useState('Hi! How can I help you?');
-  const [accentColor, setAccentColor] = useState('#6366f1');
+  const [accentColor, setAccentColor] = useState('#3b3d80');
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState(false);
   const [serverFields, setServerFields] = useState<FieldErrors>({});
@@ -48,7 +48,7 @@ export function NewChatbotDialog({ open, onOpenChange }: Props) {
     setName('');
     setDescription('');
     setWelcomeMessage('Hi! How can I help you?');
-    setAccentColor('#6366f1');
+    setAccentColor('#3b3d80');
     setSubmitting(false);
     setTouched(false);
     setServerFields({});
