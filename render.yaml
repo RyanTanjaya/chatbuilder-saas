@@ -11,8 +11,10 @@ services:
     branch: main
     autoDeploy: true
     healthCheckPath: /health
-    # postinstall runs `prisma generate`; then apply migrations and compile TS.
-    buildCommand: npm install && npm run db:migrate:deploy && npm run build
+    # --include=dev forces devDependencies (typescript + all @types/*) even though
+    # NODE_ENV=production, otherwise `tsc` can't find type declarations and the build
+    # fails. postinstall runs `prisma generate`; then apply migrations and compile TS.
+    buildCommand: npm install --include=dev && npm run db:migrate:deploy && npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
