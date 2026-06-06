@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Bot } from 'lucide-react';
 import { ChatPanel } from '@/components/ChatPanel';
+import { API_BASE_URL } from '@/lib/api';
 import type { PublicChatbot } from '@/types/chatbot';
 
 export default function PublicChat() {
@@ -19,7 +20,7 @@ export default function PublicChat() {
     let alive = true;
     setStatus('loading');
     axios
-      .get<{ chatbot: PublicChatbot }>(`/api/chatbots/${id}`)
+      .get<{ chatbot: PublicChatbot }>(`${API_BASE_URL}/chatbots/${id}`)
       .then(({ data }) => {
         if (!alive) return;
         setBot(data.chatbot);

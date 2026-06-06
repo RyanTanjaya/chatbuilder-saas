@@ -4,8 +4,15 @@ import axios from 'axios';
 
 export const TOKEN_KEY = 'chatbuilder_token';
 
+// Base URL for every API call. In dev this stays unset, so it falls back to the
+// relative '/api' that the Vite proxy forwards to http://localhost:4000 (see
+// vite.config.ts). In production it's baked in at build time as the absolute
+// Render URL, e.g. https://chatbuilder-api.onrender.com/api. Shared by the axios
+// instance below, the SSE chat stream (chatStream.ts), and the public chat page.
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) || '/api';
+
 export const api = axios.create({
-  baseURL: '/api', // proxied to http://localhost:4000 in dev (see vite.config.ts)
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 

@@ -4,7 +4,7 @@
 // ReadableStream reader and parse the SSE frames by hand. The endpoint is
 // public, but we still forward the owner's JWT when present so the dashboard
 // test window shares the same auth context as the rest of the app.
-import { TOKEN_KEY } from './api';
+import { API_BASE_URL, TOKEN_KEY } from './api';
 import type { ChatSource } from '@/types/chat';
 
 export interface StreamHandlers {
@@ -27,7 +27,7 @@ export async function streamChat(
   signal?: AbortSignal
 ): Promise<void> {
   const token = localStorage.getItem(TOKEN_KEY);
-  const res = await fetch(`/api/chatbots/${encodeURIComponent(chatbotId)}/chat`, {
+  const res = await fetch(`${API_BASE_URL}/chatbots/${encodeURIComponent(chatbotId)}/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

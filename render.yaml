@@ -1,0 +1,28 @@
+# Render Blueprint — backend web service for ChatBuilder.
+# Render auto-detects this file at the repo root. Point a new Blueprint at the
+# GitHub repo and Render provisions the service below. Secrets (sync: false) are
+# left blank for you to paste in the dashboard — they are never committed.
+services:
+  - type: web
+    name: chatbuilder-api
+    runtime: node
+    rootDir: server
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health
+    # postinstall runs `prisma generate`; then apply migrations and compile TS.
+    buildCommand: npm install && npm run db:migrate:deploy && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # PORT is injected by Render automatically and read by src/lib/env.ts.
+      - key: DATABASE_URL # Supabase session pooler URL, port 5432
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: JWT_SECRET # generate with: openssl rand -hex 32
+        sync: false
+      - key: CLIENT_ORIGIN # the Vercel production URL, e.g. https://chatbuilder.vercel.app
+        sync: false
