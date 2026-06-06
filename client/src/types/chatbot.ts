@@ -7,6 +7,7 @@ export interface Chatbot {
   accentColor: string;
   position: 'bottom-right' | 'bottom-left';
   allowedDomains: string[];
+  webhookUrl: string | null;
   createdAt: string;
   updatedAt: string;
   documentCount: number;
@@ -30,4 +31,6 @@ export interface NewChatbotInput {
   welcomeMessage?: string;
   accentColor?: string;
   position?: 'bottom-right' | 'bottom-left';
+  allowedDomains?: string[];
+  webhookUrl?: string | null;
 }

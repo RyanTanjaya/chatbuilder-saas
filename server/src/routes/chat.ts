@@ -8,6 +8,7 @@ import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { streamAnswer, type ChatTurn, type RagStream } from '../services/rag.js';
+import { fireConversationWebhook } from '../services/webhook.js';
 
 export const chatRouter = Router();
 
@@ -41,6 +42,9 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
         where: { id: conversationId, chatbotId: bot.id },
       })
     : null;
+  // Track whether this request opened a fresh thread — used to fire the
+  // "new conversation" webhook exactly once, after the first turn persists.
+  const isNewConversation = !conversation;
   if (!conversation) {
     conversation = await prisma.conversation.create({
       data: { chatbotId: bot.id, visitorId: visitorId ?? null },
@@ -143,4 +147,18 @@ chatRouter.post('/chatbots/:id/chat', async (req: Request, res: Response) => {
 
   send('done', { sources: stream.sources, createdAt: assistant.createdAt });
   res.end();
+
+  // Notify the bot owner's endpoint that a new thread has begun. Fire-and-forget
+  // and post-response, so it can never slow down or break the visitor's chat.
+  if (isNewConversation && bot.webhookUrl) {
+    void fireConversationWebhook(bot.webhookUrl, {
+      event: 'conversation.created',
+      chatbotId: bot.id,
+      chatbotName: bot.name,
+      conversationId: conversation.id,
+      visitorId: conversation.visitorId,
+      message: { role: 'user', content: message },
+      createdAt: conversation.createdAt.toISOString(),
+    });
+  }
 });

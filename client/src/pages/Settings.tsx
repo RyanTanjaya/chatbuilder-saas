@@ -25,6 +25,27 @@ const ACCENTS = [
 
 type Position = 'bottom-right' | 'bottom-left';
 
+// Mirror the server's domain normalization so the textarea, the dirty check,
+// and what actually gets saved all agree. One host per line or comma-separated.
+function parseDomains(text: string): string[] {
+  return Array.from(
+    new Set(
+      text
+        .split(/[\n,]/)
+        .map((d) =>
+          d
+            .trim()
+            .toLowerCase()
+            .replace(/^https?:\/\//, '')
+            .replace(/\/.*$/, '')
+            .replace(/:\d+$/, '')
+            .replace(/^www\./, '')
+        )
+        .filter(Boolean)
+    )
+  );
+}
+
 export default function Settings() {
   const { id = '' } = useParams();
   const { loaded, load, getById, update } = useChatbots();
@@ -35,6 +56,8 @@ export default function Settings() {
   const [welcomeMessage, setWelcomeMessage] = useState('');
   const [accentColor, setAccentColor] = useState('#3b3d80');
   const [position, setPosition] = useState<Position>('bottom-right');
+  const [allowedDomainsText, setAllowedDomainsText] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState('');
 
   const [touched, setTouched] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -54,6 +77,8 @@ export default function Settings() {
     setWelcomeMessage(bot.welcomeMessage);
     setAccentColor(bot.accentColor);
     setPosition(bot.position);
+    setAllowedDomainsText(bot.allowedDomains.join('\n'));
+    setWebhookUrl(bot.webhookUrl ?? '');
   }, [bot?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => savedTimer.current && clearTimeout(savedTimer.current), []);
@@ -82,13 +107,18 @@ export default function Settings() {
   const clientNameErr =
     touched && name.trim().length < 2 ? 'Name must be at least 2 characters' : undefined;
   const nameErr = clientNameErr ?? firstFieldError(serverFields, 'name');
+  const webhookErr = firstFieldError(serverFields, 'webhookUrl');
+
+  const parsedDomains = parseDomains(allowedDomainsText);
 
   const dirty =
     name.trim() !== bot.name ||
     (description.trim() || '') !== (bot.description ?? '') ||
     welcomeMessage.trim() !== bot.welcomeMessage ||
     accentColor !== bot.accentColor ||
-    position !== bot.position;
+    position !== bot.position ||
+    parsedDomains.join('\n') !== bot.allowedDomains.join('\n') ||
+    (webhookUrl.trim() || '') !== (bot.webhookUrl ?? '');
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -98,13 +128,19 @@ export default function Settings() {
     if (name.trim().length < 2) return;
     setSaving(true);
     try {
-      await update(id, {
+      const updated = await update(id, {
         name: name.trim(),
         description: description.trim() || undefined,
         welcomeMessage: welcomeMessage.trim() || undefined,
         accentColor,
         position,
+        allowedDomains: parsedDomains,
+        webhookUrl: webhookUrl.trim() || null,
       });
+      // Re-seed the normalized values the server actually stored so the textarea
+      // reflects the canonical hosts and the dirty check settles to clean.
+      setAllowedDomainsText(updated.allowedDomains.join('\n'));
+      setWebhookUrl(updated.webhookUrl ?? '');
       setSaved(true);
       savedTimer.current = setTimeout(() => setSaved(false), 2500);
     } catch (err) {
@@ -229,6 +265,47 @@ export default function Settings() {
               ))}
             </div>
           </Field>
+
+          <div className="mt-6 pt-5 border-t border-border">
+            <div className="font-serif text-[15px] font-semibold text-text-strong mb-1">
+              Embedding &amp; integrations
+            </div>
+            <p className="text-[12px] text-text-muted mb-4">
+              Control where the widget may run and get notified when chats start.
+            </p>
+
+            <Field
+              label="Allowed domains"
+              htmlFor="set-domains"
+              hint="One host per line (or comma-separated). Leave empty to allow the widget on any site. e.g. acme.com — subdomains are included automatically."
+            >
+              <textarea
+                id="set-domains"
+                rows={3}
+                value={allowedDomainsText}
+                onChange={(e) => setAllowedDomainsText(e.target.value)}
+                placeholder={'acme.com\nhelp.acme.com'}
+                className="w-full rounded-input bg-surface px-3.5 py-2.5 text-sm text-text-strong border border-border outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 resize-y leading-relaxed"
+              />
+            </Field>
+
+            <Field
+              label="Webhook URL"
+              htmlFor="set-webhook"
+              hint="Optional. We POST a JSON payload here the first time each visitor starts a conversation."
+              error={webhookErr}
+            >
+              <Input
+                id="set-webhook"
+                type="url"
+                inputMode="url"
+                placeholder="https://example.com/hooks/chatbuilder"
+                value={webhookUrl}
+                onChange={(e) => setWebhookUrl(e.target.value)}
+                hasError={!!webhookErr}
+              />
+            </Field>
+          </div>
 
           <div className="flex items-center gap-3 mt-6 pt-5 border-t border-border">
             <Button type="submit" variant="primary" disabled={saving || !dirty}>

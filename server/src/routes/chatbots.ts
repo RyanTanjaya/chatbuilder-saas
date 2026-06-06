@@ -11,6 +11,27 @@ export const chatbotsRouter = Router();
 const ACCENT_PRESETS = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'] as const;
 const POSITIONS = ['bottom-right', 'bottom-left'] as const;
 
+// Reduce a free-form entry ("https://www.Example.com/path", "EXAMPLE.com:443")
+// to a bare lowercase host ("example.com") so it can be compared against the
+// widget's window.location.hostname. We strip a leading "www." so an apex entry
+// also covers the www subdomain.
+function normalizeDomain(raw: string): string {
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/\/.*$/, '')
+    .replace(/:\d+$/, '')
+    .replace(/^www\./, '');
+}
+
+// http(s) URL, used for the conversation webhook. Empty string clears it.
+const httpUrl = z
+  .string()
+  .trim()
+  .max(2000)
+  .regex(/^https?:\/\/.+/i, 'Webhook URL must start with http:// or https://');
+
 const createSchema = z.object({
   name: z.string().trim().min(2, 'Name must be at least 2 characters').max(60),
   description: z.string().trim().max(280).optional().nullable(),
@@ -26,6 +47,23 @@ const createSchema = z.object({
     .optional()
     .default('#6366f1'),
   position: z.enum(POSITIONS).optional().default('bottom-right'),
+  // Whitelist of hostnames allowed to embed the widget. Empty = allow all.
+  // `undefined` (field omitted) leaves the existing value untouched on update.
+  allowedDomains: z
+    .array(z.string().max(253))
+    .max(50)
+    .optional()
+    .transform((arr) =>
+      arr === undefined
+        ? undefined
+        : Array.from(new Set(arr.map(normalizeDomain).filter((d) => d.length > 0)))
+    ),
+  // Outbound POST fired once when a new conversation starts. null clears it.
+  webhookUrl: z
+    .union([httpUrl, z.literal('')])
+    .nullable()
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v ? v : null)),
 });
 
 const updateSchema = createSchema.partial();
@@ -40,6 +78,7 @@ function publicBot(b: {
   accentColor: string;
   position: string;
   allowedDomains: string[];
+  webhookUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
   _count?: { documents: number; conversations: number };
@@ -52,6 +91,7 @@ function publicBot(b: {
     accentColor: b.accentColor,
     position: b.position,
     allowedDomains: b.allowedDomains,
+    webhookUrl: b.webhookUrl,
     createdAt: b.createdAt,
     updatedAt: b.updatedAt,
     documentCount: b._count?.documents ?? 0,

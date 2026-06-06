@@ -121,6 +121,78 @@ analyticsRouter.get('/conversations', requireAuth, async (req: AuthedRequest, re
   });
 });
 
+// Wrap a value as a CSV field: stringify, double embedded quotes, and always
+// quote so commas/newlines in message bodies can't break the column layout.
+function csvField(value: unknown): string {
+  const s = value == null ? '' : String(value);
+  return `"${s.replace(/"/g, '""')}"`;
+}
+
+// GET /api/conversations/export[?bot=<id>] — download owner's conversations as
+// CSV, one row per message. Registered before /:id so "export" isn't read as an
+// id. A UTF-8 BOM is prepended so Excel opens non-ASCII content correctly.
+analyticsRouter.get(
+  '/conversations/export',
+  requireAuth,
+  async (req: AuthedRequest, res: Response) => {
+    const userId = req.user!.id;
+    const botFilter = typeof req.query.bot === 'string' ? req.query.bot : undefined;
+
+    const bots = await prisma.chatbot.findMany({ where: { userId }, select: { id: true } });
+    let botIds = bots.map((b) => b.id);
+    if (botFilter) {
+      if (!botIds.includes(botFilter)) {
+        return res.status(404).json({ error: 'Chatbot not found' });
+      }
+      botIds = [botFilter];
+    }
+
+    const convos = await prisma.conversation.findMany({
+      where: { chatbotId: { in: botIds }, messages: { some: {} } },
+      orderBy: { createdAt: 'desc' },
+      take: 1000,
+      include: {
+        chatbot: { select: { name: true } },
+        messages: { orderBy: { createdAt: 'asc' } },
+      },
+    });
+
+    const header = [
+      'conversation_id',
+      'chatbot',
+      'visitor',
+      'conversation_started',
+      'message_role',
+      'message_content',
+      'message_at',
+    ];
+    const lines = [header.map(csvField).join(',')];
+    for (const c of convos) {
+      for (const m of c.messages) {
+        lines.push(
+          [
+            c.id,
+            c.chatbot.name,
+            c.visitorId ?? 'dashboard-test',
+            c.createdAt.toISOString(),
+            m.role,
+            m.content,
+            m.createdAt.toISOString(),
+          ]
+            .map(csvField)
+            .join(',')
+        );
+      }
+    }
+
+    const stamp = new Date().toISOString().slice(0, 10);
+    const filename = `conversations-${botFilter ? `${botFilter}-` : ''}${stamp}.csv`;
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send('﻿' + lines.join('\r\n'));
+  }
+);
+
 // GET /api/conversations/:id — full transcript. Ownership is enforced through
 // the chatbot relation, so a foreign or unknown id is indistinguishable (404).
 analyticsRouter.get(

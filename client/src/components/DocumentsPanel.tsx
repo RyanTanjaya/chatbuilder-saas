@@ -5,7 +5,7 @@
 // "uploading & embedding" state. Mutations refresh the global chatbot list so
 // the dashboard's doc counts and this page's Live/Draft pill stay in sync.
 import { useEffect, useRef, useState } from 'react';
-import { FileText, Trash2, UploadCloud, Loader2 } from 'lucide-react';
+import { FileText, Trash2, UploadCloud, Loader2, Link2, Plus } from 'lucide-react';
 import { api } from '@/lib/api';
 import { normaliseError } from '@/lib/errors';
 import { cn } from '@/lib/utils';
@@ -29,12 +29,24 @@ function formatBytes(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// Display just the host for URL-sourced documents (falls back to the raw string
+// if it somehow isn't a parseable URL).
+function hostnameOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
 export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
   const [docs, setDocs] = useState<DocumentMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [drag, setDrag] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [urlInput, setUrlInput] = useState('');
+  const [addingUrl, setAddingUrl] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -78,6 +90,27 @@ export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
       setError(message || 'Upload failed. Please try again.');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleAddUrl = async () => {
+    const url = urlInput.trim();
+    if (!url || addingUrl || uploading) return;
+    setError(null);
+    setAddingUrl(true);
+    try {
+      const { data } = await api.post<{ document: DocumentMeta }>(
+        `/chatbots/${chatbotId}/documents/url`,
+        { url }
+      );
+      setDocs((d) => [data.document, ...d]);
+      setUrlInput('');
+      void useChatbots.getState().load(); // refresh dashboard counts + Live pill
+    } catch (err) {
+      const { message } = normaliseError(err);
+      setError(message || 'Could not ingest that URL. Please try again.');
+    } finally {
+      setAddingUrl(false);
     }
   };
 
@@ -155,6 +188,39 @@ export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
           <div className="text-xs text-text-muted mt-1">Up to 10 MB per file</div>
         </div>
 
+        {/* Ingest a web page by URL — same chunk → embed pipeline as a file. */}
+        <div className="mt-3 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Link2
+              size={15}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+            />
+            <input
+              type="url"
+              inputMode="url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  void handleAddUrl();
+                }
+              }}
+              disabled={addingUrl || uploading}
+              placeholder="Add a page by URL — https://…"
+              className="h-[42px] w-full rounded-input bg-surface pl-9 pr-3 text-sm text-text-strong border border-border outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => void handleAddUrl()}
+            disabled={addingUrl || uploading || !urlInput.trim()}
+            className="grid place-items-center h-[42px] px-3.5 rounded-input bg-primary text-white text-sm font-semibold transition-colors hover:bg-primary-dark disabled:opacity-50 disabled:pointer-events-none flex-none"
+          >
+            {addingUrl ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
+          </button>
+        </div>
+
         {error && (
           <div className="mt-3 text-sm text-danger bg-danger-soft rounded-lg px-3 py-2">{error}</div>
         )}
@@ -184,9 +250,9 @@ export function DocumentsPanel({ chatbotId }: DocumentsPanelProps) {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold text-text-strong truncate">{d.filename}</div>
-                  <div className="text-xs text-text-muted">
+                  <div className="text-xs text-text-muted truncate">
                     {formatBytes(d.byteSize)} · {d.chunkCount} chunk{d.chunkCount === 1 ? '' : 's'} ·{' '}
-                    {d.fileType.toUpperCase()}
+                    {d.fileType === 'url' && d.source ? hostnameOf(d.source) : d.fileType.toUpperCase()}
                   </div>
                 </div>
                 <button

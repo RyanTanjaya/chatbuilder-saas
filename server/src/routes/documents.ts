@@ -5,6 +5,7 @@
 // once the embedding pipeline lands.
 import { Router, type Response } from 'express';
 import multer from 'multer';
+import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth, type AuthedRequest } from '../middleware/auth.js';
 import {
@@ -14,6 +15,19 @@ import {
   SUPPORTED_EXTENSIONS,
 } from '../lib/extract.js';
 import { ingestDocument } from '../services/ingest.js';
+import { scrapeUrl } from '../services/scrape.js';
+
+// Fields returned for every document row — shared by the list endpoint and the
+// upload/URL ingestion responses so the client always gets the same shape.
+const DOC_SELECT = {
+  id: true,
+  filename: true,
+  fileType: true,
+  source: true,
+  byteSize: true,
+  chunkCount: true,
+  createdAt: true,
+} as const;
 
 export const documentsRouter = Router();
 
@@ -54,14 +68,7 @@ documentsRouter.get(
     const docs = await prisma.document.findMany({
       where: { chatbotId: found.bot.id },
       orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        filename: true,
-        fileType: true,
-        byteSize: true,
-        chunkCount: true,
-        createdAt: true,
-      },
+      select: DOC_SELECT,
     });
     res.json({ documents: docs });
   }
@@ -133,14 +140,7 @@ documentsRouter.post(
 
     const fresh = await prisma.document.findUnique({
       where: { id: doc.id },
-      select: {
-        id: true,
-        filename: true,
-        fileType: true,
-        byteSize: true,
-        chunkCount: true,
-        createdAt: true,
-      },
+      select: DOC_SELECT,
     });
     res.status(201).json({
       document: fresh,
@@ -149,6 +149,81 @@ documentsRouter.post(
         wordCount: ingest.wordCount,
         chunkCount: ingest.chunkCount,
         preview: extracted.text.slice(0, 280),
+      },
+    });
+  }
+);
+
+// POST /api/chatbots/:id/documents/url — ingest a web page by URL. Scrapes the
+// page to plain text, then runs the same chunk → embed → store pipeline as a
+// file upload. The resulting Document is fileType "url" with the page title as
+// its filename and the original URL kept in `source`.
+const urlSchema = z.object({
+  url: z.string().trim().min(1, 'Enter a URL').max(2000),
+});
+
+documentsRouter.post(
+  '/chatbots/:id/documents/url',
+  requireAuth,
+  async (req: AuthedRequest, res: Response) => {
+    const found = await loadOwnedChatbot(String(req.params.id), req.user!.id);
+    if (found.error === 'not_found') return res.status(404).json({ error: 'Chatbot not found' });
+    if (found.error === 'forbidden') return res.status(403).json({ error: 'Not your chatbot' });
+
+    const parsed = urlSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    }
+
+    let scraped;
+    try {
+      scraped = await scrapeUrl(parsed.data.url);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Could not fetch that page.';
+      return res.status(422).json({ error: message });
+    }
+
+    if (scraped.text.split(/\s+/).filter(Boolean).length < 20) {
+      return res.status(422).json({
+        error: "We couldn't find enough readable text on that page to ingest.",
+      });
+    }
+
+    const doc = await prisma.document.create({
+      data: {
+        chatbotId: found.bot.id,
+        filename: scraped.title,
+        fileType: 'url',
+        source: parsed.data.url,
+        byteSize: Buffer.byteLength(scraped.text, 'utf8'),
+        chunkCount: 0,
+      },
+    });
+
+    let ingest;
+    try {
+      ingest = await ingestDocument({
+        documentId: doc.id,
+        chatbotId: found.bot.id,
+        text: scraped.text,
+      });
+    } catch (err) {
+      await prisma.document.delete({ where: { id: doc.id } }).catch(() => {});
+      const message = err instanceof Error ? err.message : 'Embedding pipeline failed.';
+      return res.status(502).json({ error: `Could not embed that page: ${message}` });
+    }
+
+    const fresh = await prisma.document.findUnique({
+      where: { id: doc.id },
+      select: DOC_SELECT,
+    });
+    res.status(201).json({
+      document: fresh,
+      extraction: {
+        charCount: ingest.charCount,
+        wordCount: ingest.wordCount,
+        chunkCount: ingest.chunkCount,
+        preview: scraped.text.slice(0, 280),
       },
     });
   }

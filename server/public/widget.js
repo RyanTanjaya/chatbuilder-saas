@@ -62,6 +62,27 @@
     );
   }
 
+  // Domain allow-list gate. The bot owner can restrict which sites may embed the
+  // widget; the public config carries the normalized host list (no protocol, no
+  // "www.", lowercase). An empty/absent list means "allow anywhere". We match the
+  // current page's host exactly or as a subdomain (foo.acme.com matches acme.com).
+  function isAllowedHere(cfg) {
+    var list = cfg && cfg.allowedDomains;
+    if (!list || !list.length) return true;
+    var host = (window.location.hostname || '').toLowerCase().replace(/^www\./, '');
+    for (var i = 0; i < list.length; i++) {
+      var d = String(list[i] || '')
+        .toLowerCase()
+        .replace(/^www\./, '');
+      if (!d) continue;
+      var suffix = '.' + d;
+      if (host === d || (host.length > suffix.length && host.slice(-suffix.length) === suffix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function mount(cfg) {
     var accent = cfg.accentColor || '#6366f1';
     var side = cfg.position === 'bottom-left' ? 'left' : 'right';
@@ -155,7 +176,16 @@
         return res.json();
       })
       .then(function (data) {
-        mount(data.chatbot || {});
+        var cfg = data.chatbot || {};
+        if (!isAllowedHere(cfg)) {
+          console.warn(
+            '[ChatBuilder] widget: ' +
+              window.location.hostname +
+              " is not in this chatbot's allowed domains — not mounting."
+          );
+          return;
+        }
+        mount(cfg);
       })
       .catch(function (err) {
         console.warn('[ChatBuilder] widget: could not load chatbot config —', err.message);

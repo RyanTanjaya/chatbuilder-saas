@@ -4,6 +4,7 @@ export interface DocumentMeta {
   id: string;
   filename: string;
   fileType: 'pdf' | 'txt' | 'docx' | 'url';
+  source?: string | null; // original URL when fileType is "url"
   byteSize: number;
   chunkCount: number;
   createdAt: string;

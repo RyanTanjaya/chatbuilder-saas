@@ -1,9 +1,9 @@
 // Conversations (/conversations) — owner's chat history. Left: a list of threads
 // (optionally filtered to one bot via ?bot=<id>); right: the full transcript of
 // the selected thread. Both come from GET /api/conversations[/:id]. Read-only.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Bot, FileText, MessagesSquare, User } from 'lucide-react';
+import { Bot, Download, FileText, MessagesSquare, User } from 'lucide-react';
 import { Shell } from '@/components/Shell';
 import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api';
@@ -70,6 +70,7 @@ export default function Conversations() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ConversationDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!botsLoaded) void loadBots();
@@ -126,9 +127,38 @@ export default function Conversations() {
     };
   }, [selectedId]);
 
-  const filterSelect = useMemo(
-    () =>
-      bots.length > 1 ? (
+  // Download the current view (respecting the bot filter) as CSV. Routed through
+  // axios so the JWT Authorization header rides along — a plain <a href> can't
+  // attach it. The server streams one row per message with a UTF-8 BOM.
+  const exportCsv = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const url = botParam
+        ? `/conversations/export?bot=${encodeURIComponent(botParam)}`
+        : '/conversations/export';
+      const res = await api.get(url, { responseType: 'blob' });
+      const blob = new Blob([res.data as BlobPart], { type: 'text/csv;charset=utf-8' });
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = href;
+      const cd = res.headers['content-disposition'] as string | undefined;
+      const match = cd?.match(/filename="?([^"]+)"?/);
+      a.download = match?.[1] ?? `conversations-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(href);
+    } catch {
+      // Best-effort download; nothing destructive happens on failure.
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const headerActions = (
+    <div className="flex items-center gap-2">
+      {bots.length > 1 ? (
         <select
           value={botParam}
           onChange={(e) => {
@@ -145,13 +175,21 @@ export default function Conversations() {
             </option>
           ))}
         </select>
-      ) : null,
-    [bots, botParam, setParams]
+      ) : null}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => void exportCsv()}
+        disabled={exporting || items.length === 0}
+      >
+        <Download size={14} /> {exporting ? 'Exporting…' : 'Export CSV'}
+      </Button>
+    </div>
   );
 
   if (listLoaded && items.length === 0) {
     return (
-      <Shell title="Conversations" subtitle="Every chat your bots have had" actions={filterSelect}>
+      <Shell title="Conversations" subtitle="Every chat your bots have had" actions={headerActions}>
         <div className="bg-surface border-2 border-dashed border-border-strong rounded-card p-14 text-center">
           <div className="grid place-items-center w-14 h-14 rounded-full bg-primary-light mx-auto mb-4">
             <MessagesSquare size={24} className="text-primary-dark" />
@@ -172,7 +210,7 @@ export default function Conversations() {
   }
 
   return (
-    <Shell title="Conversations" subtitle="Every chat your bots have had" actions={filterSelect}>
+    <Shell title="Conversations" subtitle="Every chat your bots have had" actions={headerActions}>
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-5 items-start">
         {/* Thread list */}
         <div className="bg-surface border border-border rounded-card overflow-hidden">
